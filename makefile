@@ -6,7 +6,7 @@ CFLAGS = -c -mthumb -mcpu=cortex-m3
 LDFLAGS = -T linker.ld -nostartfiles -nostdlib -lgcc
 
 OBJS = ./bin/main.o ./bin/reset.o ./bin/GPIO.o ./bin/RCC.o \
-		./bin/UART.o
+		./bin/USART.o
 
 all: firmware.bin
 
@@ -31,7 +31,7 @@ firmware.elf: $(OBJS)
 ./bin/GPIO.o: ./src/GPIO.c ./include/GPIO.h
 	$(CC) $(CFLAGS) $< -o $@
 
-./bin/UART.o: ./src/UART.c ./include/UART.h
+./bin/USART.o: ./src/USART.c ./include/USART.h
 	$(CC) $(CFLAGS) $< -o $@
 
 

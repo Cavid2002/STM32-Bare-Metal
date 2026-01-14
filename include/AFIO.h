@@ -15,6 +15,10 @@ typedef struct
 } AFIO_REGS;
 
 
+void AFIO_remap()
+{
+    
+}
 
 
 

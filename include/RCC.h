@@ -82,6 +82,10 @@ void RCC_APB2DevEnable(uint32_t dev);
 void RCC_AHBDevEnable(uint32_t dev);
 
 
+void RCC_APB1DevDisable(uint32_t dev);
+void RCC_APB2DevDisable(uint32_t dev);
+void RCC_AHBDevDisable(uint32_t dev);
+
 #define RCC_BASE_ADDR ((RCC_REGS*)0x40021000)
 
 
