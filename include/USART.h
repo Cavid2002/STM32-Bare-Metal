@@ -38,6 +38,8 @@
 #define USART_CR2_LBDL       5
 #define USART_CR2_ADD        0
 
+#define USART_TIMEOUT       1000
+
 typedef struct
 {
     volatile uint32_t SR;

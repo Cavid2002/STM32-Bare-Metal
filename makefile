@@ -3,7 +3,7 @@ LD = arm-none-eabi-gcc
 OBJCPY = arm-none-eabi-objcopy
 
 CFLAGS = -c -mthumb -mcpu=cortex-m3
-LDFLAGS = -T linker.ld -nostartfiles -nostdlib -lgcc
+LDFLAGS = -T linker.ld -nostartfiles -nostdlib -lgcc 
 
 OBJS = ./bin/main.o ./bin/reset.o ./bin/GPIO.o ./bin/RCC.o \
 		./bin/USART.o
@@ -38,8 +38,10 @@ firmware.elf: $(OBJS)
 
 .PHONY: clean flash dasm
 
-flash: firmware.bin
-	ST-LINK_CLI -ME
+flash-unix: firmware.bin
+	st-flash write 0x08000000 --reset
+
+flash-windows: firmware.bin
 	ST-LINK_CLI -P $< 0x08000000
 
 dasm: firmware.bin

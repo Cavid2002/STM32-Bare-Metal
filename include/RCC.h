@@ -59,6 +59,26 @@
 #define RCC_AHB_ENB_SDIO        10
 
 
+#define RCC_CR_PLLRDY   25
+#define RCC_CR_PLLEN    24
+#define RCC_CR_CSEN     19
+#define RCC_CR_HSEBYP   18
+#define RCC_CR_HSERDY   17
+#define RCC_CR_HSEEN    16
+#define RCC_CR_HSICAL   8
+#define RCC_CR_HSITRIM  3
+#define RCC_CR_HSIRDY   1
+#define RCC_CR_HSIEN    0
+
+#define RCC_CFGR_SW     0
+
+
+#define RCC_SW_HSI      0
+#define RCC_SW_HSE      1
+#define RCC_SW_PLL      2
+
+
+
 
 
 typedef struct{
@@ -87,6 +107,4 @@ void RCC_APB2DevDisable(uint32_t dev);
 void RCC_AHBDevDisable(uint32_t dev);
 
 #define RCC_BASE_ADDR ((RCC_REGS*)0x40021000)
-
-
 #endif
