@@ -11,7 +11,7 @@ void USART_Enable(uint32_t pclk, uint32_t baudrate)
     USART1_BASE->CR1 |= 1 << USART_CR1_TE;
 }
 
-int USART_Wait(USART_REGS* base, uint8_t flag, uint16_t timeout)
+int USART_poll(USART_REGS* base, uint8_t flag, uint16_t timeout)
 {
     while(timeout)
     {
@@ -22,16 +22,19 @@ int USART_Wait(USART_REGS* base, uint8_t flag, uint16_t timeout)
     return -1;
 }
 
-void USART_Write(USART_REGS* base, uint8_t c)
+void USART_write_poll(USART_REGS* base, uint8_t c)
 {
-    if(USART_Wait(base, USART_STATUS_TC, 1000))
+    if(USART_poll(base, 1 << USART_STATUS_TC, 1000))
     base->DR = c;
 }
 
-uint8_t USART_Read(USART_REGS* base)
+uint8_t USART_read_poll(USART_REGS* base)
 {
-    USART_Wait(base, USART_STATUS_RXNE, 1000);
+    USART_poll(base, 1 << USART_STATUS_RXNE, 1000);
     return base->DR;
 }
 
-
+void USART_interrupt_enable(USART_REGS* base, uint32_t iflag)
+{
+    
+}
