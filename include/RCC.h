@@ -106,5 +106,8 @@ void RCC_APB1DevDisable(uint32_t dev);
 void RCC_APB2DevDisable(uint32_t dev);
 void RCC_AHBDevDisable(uint32_t dev);
 
+
+int RCC_HSE_PLL_enable();
+
 #define RCC_BASE_ADDR ((RCC_REGS*)0x40021000)
 #endif

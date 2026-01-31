@@ -28,6 +28,16 @@ void RCC_SysClkSelect(uint32_t clock_type)
     RCC_BASE_ADDR->CFGR |= clock_type << RCC_CFGR_SW; 
 }
 
+
+int RCC_HSE_PLL_enable()
+{
+    RCC_BASE_ADDR->CR |= 1 << RCC_CR_HSEEN | 1 << RCC_CR_PLLEN;
+    RCC_BASE_ADDR->CFGR |= 7 << 18 | 1 << 16 | 5 << 8 | 2 << 0;
+    if(RCC_BASE_ADDR->CR & 1 << 19) return 0;
+
+    return -1;
+}
+
 void RCC_APB1DevEnable(uint32_t dev)
 {
     RCC_BASE_ADDR->APB1_ENBR |= 1 << dev;

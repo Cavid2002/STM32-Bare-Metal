@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+
+
 typedef struct 
 {
     volatile uint32_t EVCR;
@@ -15,10 +17,8 @@ typedef struct
 } AFIO_REGS;
 
 
-void AFIO_remap()
-{
-    
-}
+#define AFIO_BASE ((AFIO_REGS*)0x40010000)
+
 
 
 

@@ -2,7 +2,7 @@ CC = arm-none-eabi-gcc
 LD = arm-none-eabi-gcc
 OBJCPY = arm-none-eabi-objcopy
 
-CFLAGS = -c -mthumb -mcpu=cortex-m3
+CFLAGS = -c -mcpu=cortex-m3
 LDFLAGS = -T linker.ld -nostartfiles -nostdlib -lgcc 
 
 OBJS = ./bin/main.o ./bin/reset.o ./bin/GPIO.o ./bin/RCC.o \
@@ -45,7 +45,7 @@ flash-windows: firmware.bin
 	ST-LINK_CLI -P $< 0x08000000
 
 dasm: firmware.bin
-	arm-none-eabi-objdump -D -b binary -m arm -M force-thumb --adjust-vma=0x08000000 $< > dasm.txt
+	arm-none-eabi-objdump -D -b binary -m arm --adjust-vma=0x08000000 $< > dasm.txt 
 
 clean:
 	rm -rf  firmware.elf firmware.bin dasm.txt

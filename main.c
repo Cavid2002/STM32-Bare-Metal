@@ -16,7 +16,8 @@ void delay(uint32_t delay)
 
 int main()
 {
-    rcc_set();
+    RCC_HSE_PLL_enable();
+    RCC_APB2DevEnable(RCC_APB2_ENB_PORT_A);
     GPIO_pinMode(GPIO_BASE_A, 0, GPIO_MODE_OUTPUT_10Mhz, GPIO_CFG_OUTPUT_PUSH_PULL);
     GPIO_pinMode(GPIO_BASE_A, 1, GPIO_MODE_OUTPUT_10Mhz, GPIO_CFG_OUTPUT_PUSH_PULL);
     GPIO_pinMode(GPIO_BASE_A, 2, GPIO_MODE_OUTPUT_10Mhz, GPIO_CFG_OUTPUT_PUSH_PULL);
