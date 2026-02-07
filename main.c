@@ -4,7 +4,7 @@
 #include "./include/USART.h"
 
 
-
+const char* start = "Hello World\r\n";
 
 
 void delay(uint32_t delay)
@@ -28,12 +28,15 @@ int main()
 
     while(1)
     {
-        GPIO_pinToggle(GPIO_BASE_A, 0);
-        GPIO_pinToggle(GPIO_BASE_A, 1);
+        
+
+        USART_write_line(USART1_BASE, start);
 
         key = USART_read_poll(USART1_BASE);
         USART_write_poll(USART1_BASE, key);
-       
+        GPIO_pinToggle(GPIO_BASE_A, 1);
+        GPIO_pinToggle(GPIO_BASE_A, 0);
+        delay(10000);
     }
 }
 

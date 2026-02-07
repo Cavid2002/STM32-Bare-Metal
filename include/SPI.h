@@ -3,6 +3,14 @@
 
 #include <stdint.h>
 
+#define SPI_SR_BSY      1 << 7
+#define SPI_SR_OVR      1 << 6
+#define SPI_SR_MODF     1 << 5
+#define SPI_SR_CRCERR   1 << 4
+#define SPI_SR_TXE      1 << 1
+#define SPI_SR_RXNE     1 << 0
+
+
 typedef struct
 {
     volatile uint32_t CR1;
@@ -15,5 +23,9 @@ typedef struct
 } SPI_REGS;
 
 #define SPI1_BASE ((SPI_REGS*)(0x40013000))
+
+
+void SPI_write_poll(SPI_REGS* base, uint16_t data);
+uint16_t SPI_read_poll(SPI_REGS* base);
 
 #endif

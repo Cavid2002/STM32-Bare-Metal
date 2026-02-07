@@ -61,6 +61,8 @@ int USART_poll(USART_REGS* base, uint8_t flag, uint16_t timeout);
 void USART_write_poll(USART_REGS* base, uint8_t c);
 uint8_t USART_read_poll(USART_REGS* base);
 void USART1_init(uint32_t baud_rate);
+int USART_write_line(USART_REGS* base, const char* str);
+
 
 #define USART1_BASE ((USART_REGS*)0x40013800)
 #define USART2_BASE ((USART_REGS*)0x40004400)

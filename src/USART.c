@@ -17,6 +17,16 @@ uint8_t USART_read_poll(USART_REGS* base)
 }
 
 
+int USART_write_line(USART_REGS* base, const char* str)
+{
+    int i = 0;
+    while(str[i])
+    {
+        USART_write_poll(base, str[i]);
+        i++;
+    }
+}
+
 void USART1_init(uint32_t baud_rate)
 {
     uint32_t apb_clk = 36000000;

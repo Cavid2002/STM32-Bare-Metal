@@ -36,10 +36,10 @@ firmware.elf: $(OBJS)
 
 
 
-.PHONY: clean flash dasm
+.PHONY: clean flash-unix flash-windows dasm
 
 flash-unix: firmware.bin
-	st-flash write 0x08000000 --reset
+	st-flash write $< 0x08000000
 
 flash-windows: firmware.bin
 	ST-LINK_CLI -P $< 0x08000000
