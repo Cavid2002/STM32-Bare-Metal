@@ -1,51 +1,36 @@
 #include "../include/USART.h"
 #include "../include/RCC.h"
 #include "../include/AFIO.h"
+#include "../include/GPIO.h"
 
-
-
-void USART_config(USART_REGS* base, 
-    uint32_t baud_rate, uint32_t word_len, uint32_t parity_type)
-{
-    
-    if(base == USART1_BASE) AFIO_BASE->MAPR |= 1 << 2; 
-    
-    base->CR1 |= 1 << USART_CR1_UE | 1 << USART_CR1_TE 
-                    | 1 << word_len | 1 << parity_type;
-    
-    base->BRR = baud_rate;
-} 
-
-uint32_t USART_compute_baud(uint32_t apb_clk, uint32_t baud_rate)
-{
-    
-}
-
-
-int USART_poll(USART_REGS* base, uint8_t flag, uint16_t timeout)
-{
-    while(timeout)
-    {
-        if(base->SR & flag) return flag;
-        timeout--;
-    }
-
-    return -1;
-}
 
 void USART_write_poll(USART_REGS* base, uint8_t c)
 {
-    while(!(base->SR & 1 << USART_STATUS_TXE));
+    while(!(base->SR & (1 << USART_STATUS_TC)));
     base->DR = c;
 }
 
 uint8_t USART_read_poll(USART_REGS* base)
 {
-    while(!(base->SR & 1 << USART_STATUS_RXNE))
+    while(!(base->SR & (1 << USART_STATUS_RXNE)));
     return base->DR;
 }
 
-void USART_interrupt_enable(USART_REGS* base, uint32_t iflag)
+
+void USART1_init(uint32_t baud_rate)
 {
-    base->CR1 |= base;
+    uint32_t apb_clk = 36000000;
+    RCC_BASE_ADDR->APB2_ENBR |= RCC_APB2_ENB_USART1;
+    RCC_BASE_ADDR->APB2_ENBR |= RCC_APB2_ENB_PORT_B;
+    RCC_BASE_ADDR->APB2_ENBR |= RCC_APB2_ENB_AFIO;
+    AFIO_BASE->MAPR |= 1 << 2;
+
+    USART1_BASE->BRR = ((apb_clk + (baud_rate/2U)) / baud_rate);  
+
+    GPIO_BASE_B->CFGR_LOW &= ~(0xFF << 24);
+    GPIO_BASE_B->CFGR_LOW |= 0b1011 << 24;
+    GPIO_BASE_B->CFGR_LOW |= 0b0100 << 28;
+
+    USART1_BASE->CR1 |= 1 << USART_CR1_UE | 1 << USART_CR1_TE | 1 << USART_CR1_RE;
+    
 }
