@@ -20,20 +20,20 @@ void delay(uint32_t delay)
 int main()
 {
     uint8_t key = 0;
-    RCC_HSE_PLL_enable();
+    RCC_HSI_enable();
     RCC_APB2DevEnable(RCC_APB2_ENB_PORT_A);
     GPIO_pinMode(GPIO_BASE_A, 0, GPIO_MODE_OUTPUT_10Mhz, GPIO_CFG_OUTPUT_PUSH_PULL);
     GPIO_pinMode(GPIO_BASE_A, 1, GPIO_MODE_OUTPUT_10Mhz, GPIO_CFG_OUTPUT_PUSH_PULL);
-    USART1_init(9600);
+    // USART1_init(9600);
 
     while(1)
     {
         
 
-        USART_write_line(USART1_BASE, start);
+        // USART_write_line(USART1_BASE, start);
 
-        key = USART_read_poll(USART1_BASE);
-        USART_write_poll(USART1_BASE, key);
+        // key = USART_read_poll(USART1_BASE);
+        // USART_write_poll(USART1_BASE, key);
         GPIO_pinToggle(GPIO_BASE_A, 1);
         GPIO_pinToggle(GPIO_BASE_A, 0);
         delay(10000);
