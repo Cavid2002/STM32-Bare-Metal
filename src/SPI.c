@@ -9,6 +9,7 @@ void SPI1_init()
 }
 
 
+
 void SPI_write_poll(SPI_REGS* base, uint16_t data)
 {
     while(!(base->SR & SPI_SR_TXE));
