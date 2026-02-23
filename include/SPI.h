@@ -25,10 +25,10 @@ typedef struct
 #define SPI1_BASE ((SPI_REGS*)(0x40013000))
 
 
-uint8_t SPI_transmit(SPI_REGS* base, uint8_t data);
+uint8_t SPI_transmit_poll(SPI_REGS* base, uint8_t data);
 uint8_t SPI_read_poll(SPI_REGS* base);
 void SPI_write_poll(SPI_REGS* base, uint8_t data);
-void SPI_start(SPI_REGS* base);
-void SPI_stop(SPI_REGS* base);
+void CS_low(SPI_REGS* base);
+void CS_high(SPI_REGS* base);
 
 #endif

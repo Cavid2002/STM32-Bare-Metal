@@ -6,7 +6,7 @@ CFLAGS = -c -mcpu=cortex-m3
 LDFLAGS = -T linker.ld -nostartfiles -nostdlib -lgcc 
 
 OBJS = ./bin/main.o ./bin/reset.o ./bin/GPIO.o ./bin/RCC.o \
-		./bin/USART.o
+		./bin/USART.o ./bin/SD.o ./bin/SPI.o
 
 all: firmware.bin
 
@@ -35,6 +35,12 @@ firmware.elf: $(OBJS)
 	$(CC) $(CFLAGS) $< -o $@
 
 
+./bin/SPI.o: ./src/SPI.c ./include/SPI.h
+	$(CC) $(CFLAGS) $< -o $@
+
+
+./bin/SD.o: ./src/SD.c ./include/SD.h
+	$(CC) $(CFLAGS) $< -o $@
 
 .PHONY: clean flash-unix flash-windows dasm
 

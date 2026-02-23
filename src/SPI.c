@@ -16,39 +16,37 @@ void SPI1_init()
     SPI1_BASE->CR1 |= 1 << 6;
 }
 
-void SPI_start(SPI_REGS* base)
+void CS_low(SPI_REGS* base)
 {
     base->CR1 &= ~(1 << 8);
 }
 
-void SPI_stop(SPI_REGS* base)
+void CS_high(SPI_REGS* base)
 {
     base->CR1 |= 1 << 8;
 }
 
 
-uint8_t SPI_transmit(SPI_REGS* base, uint8_t data)
+uint8_t SPI_transmit_poll(SPI_REGS* base, uint8_t data)
 {
-    SPI_start(base);
-
     while(!(base->SR & SPI_SR_TXE));
 
-    base->DR = base;
+    base->DR = data;
     
     while(!(base->SR & SPI_SR_RXNE))
 
-    SPI_stop(base);
     return base->DR;
 }
 
 uint8_t SPI_read_poll(SPI_REGS* base)
 {
-    return SPI_transmit(0x00);
+    return SPI_transmit_poll(base, 0xFF);
 }
 
 void SPI_write_poll(SPI_REGS* base, uint8_t data)
 {
-    SPI_transmit(data);
+    SPI_transmit_poll(base, data);
     return;
 }
+
 

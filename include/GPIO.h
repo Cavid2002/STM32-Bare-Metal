@@ -4,10 +4,10 @@
 
 #include <stdint.h>
 
-#define GPIO_CFG_INPUT_ANLG       0x0
-#define GPIO_CFG_INPUT_FLT        0x1
-#define GPIO_CFG_INPUT_PUSH_PULL  0x2
-#define GPIO_CFG_INPUT_RESERVED   0x3
+#define GPIO_CFG_INPUT_ANLG         0x0
+#define GPIO_CFG_INPUT_FLT          0x1
+#define GPIO_CFG_INPUT_PUSH_PULL    0x2
+#define GPIO_CFG_INPUT_RESERVED     0x3
 
 #define GPIO_CFG_OUTPUT_PUSH_PULL   0x0
 #define GPIO_CFG_OUTPUT_OPEN_DRAIN  0x1

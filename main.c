@@ -2,9 +2,12 @@
 #include "./include/GPIO.h"
 #include "./include/RCC.h"
 #include "./include/USART.h"
+#include "./include/SD.h"
 
 
-char start[20] = "Hello World\r\n";
+char start[SECTOR_SIZE] = "Hello World\r\n";
+char temp[SECTOR_SIZE];
+
 
 
 void delay(uint32_t delay)
@@ -25,12 +28,16 @@ int main()
     GPIO_pinMode(GPIO_BASE_A, 0, GPIO_MODE_OUTPUT_10Mhz, GPIO_CFG_OUTPUT_PUSH_PULL);
     GPIO_pinMode(GPIO_BASE_A, 1, GPIO_MODE_OUTPUT_10Mhz, GPIO_CFG_OUTPUT_PUSH_PULL);
     USART1_init(9600);
+    SD_init();
+    SD_write_block(start, 1);   
+    SD_read_block(temp, 1); 
 
     while(1)
     {
         
         start[counter % 10] += 1;
         USART_write_line(USART1_BASE, start);
+        USART_write_line(USART1_BASE, temp);
 
         key = USART_read_poll(USART1_BASE);
         USART_write_poll(USART1_BASE, key);
