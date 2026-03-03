@@ -22,5 +22,7 @@ int SD_read_block(char* buff, uint32_t lba);
 void SD_adjust_freq(uint8_t freq);
 int SD_reset();
 uint8_t SD_send_command(uint8_t cmd, uint32_t args, uint8_t crc);
+void console_log(const char* msg);
 
+void SPI_loopback_test();
 #endif

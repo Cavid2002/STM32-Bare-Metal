@@ -3,60 +3,60 @@
 
 #include <stdint.h>
 
-#define RCC_APB1_ENB_TIM2       1 << 0
-#define RCC_APB1_ENB_TIM3       1 << 1
-#define RCC_APB1_ENB_TIM4       1 << 2
-#define RCC_APB1_ENB_TIM5       1 << 3
-#define RCC_APB1_ENB_TIM6       1 << 4
-#define RCC_APB1_ENB_TIM7       1 << 5
-#define RCC_APB1_ENB_TIM12      1 << 6
-#define RCC_APB1_ENB_TIM13      1 << 7
-#define RCC_APB1_ENB_TIM14      1 << 8
-#define RCC_APB1_ENB_WWD        1 << 11
-#define RCC_APB1_ENB_SPI2       1 << 14
-#define RCC_APB1_ENB_SPI3       1 << 15
-#define RCC_APB1_ENB_USART2     1 << 17
-#define RCC_APB1_ENB_USART3     1 << 18
-#define RCC_APB1_ENB_USART4     1 << 19
-#define RCC_APB1_ENB_USART5     1 << 20
-#define RCC_APB1_ENB_I2C1       1 << 21
-#define RCC_APB1_ENB_I2C2       1 << 22
-#define RCC_APB1_ENB_USB        1 << 23
-#define RCC_APB1_ENB_CAN        1 << 25
-#define RCC_APB1_ENB_BKP        1 << 27
-#define RCC_APB1_ENB_PWRI       1 << 28
-#define RCC_APB1_ENB_DAC        1 << 29
+#define RCC_APB1_ENB_TIM2       (1 << 0)
+#define RCC_APB1_ENB_TIM3       (1 << 1)
+#define RCC_APB1_ENB_TIM4       (1 << 2)
+#define RCC_APB1_ENB_TIM5       (1 << 3)
+#define RCC_APB1_ENB_TIM6       (1 << 4)
+#define RCC_APB1_ENB_TIM7       (1 << 5)
+#define RCC_APB1_ENB_TIM12      (1 << 6)
+#define RCC_APB1_ENB_TIM13      (1 << 7)
+#define RCC_APB1_ENB_TIM14      (1 << 8)
+#define RCC_APB1_ENB_WWD        (1 << 11)
+#define RCC_APB1_ENB_SPI2       (1 << 14)
+#define RCC_APB1_ENB_SPI3       (1 << 15)
+#define RCC_APB1_ENB_USART2     (1 << 17)
+#define RCC_APB1_ENB_USART3     (1 << 18)
+#define RCC_APB1_ENB_USART4     (1 << 19)
+#define RCC_APB1_ENB_USART5     (1 << 20)
+#define RCC_APB1_ENB_I2C1       (1 << 21)
+#define RCC_APB1_ENB_I2C2       (1 << 22)
+#define RCC_APB1_ENB_USB        (1 << 23)
+#define RCC_APB1_ENB_CAN        (1 << 25)
+#define RCC_APB1_ENB_BKP        (1 << 27)
+#define RCC_APB1_ENB_PWRI       (1 << 28)
+#define RCC_APB1_ENB_DAC        (1 << 29)
 
 
 
 
-#define RCC_APB2_ENB_AFIO       1 << 0
-#define RCC_APB2_ENB_PORT_A     1 << 2
-#define RCC_APB2_ENB_PORT_B     1 << 3
-#define RCC_APB2_ENB_PORT_C     1 << 4
-#define RCC_APB2_ENB_PORT_D     1 << 5
-#define RCC_APB2_ENB_PORT_E     1 << 6
-#define RCC_APB2_ENB_PORT_F     1 << 7
-#define RCC_APB2_ENB_PORT_G     1 << 8
-#define RCC_APB2_ENB_ADC1       1 << 9
-#define RCC_APB2_ENB_ADC2       1 << 10
-#define RCC_APB2_ENB_TIM1       1 << 11
-#define RCC_APB2_ENB_SPI1       1 << 12
-#define RCC_APB2_ENB_TIM8       1 << 13
-#define RCC_APB2_ENB_USART1     1 << 14
-#define RCC_APB2_ENB_ADC3       1 << 15
-#define RCC_APB2_ENB_TIM9       1 << 19
-#define RCC_APB2_ENB_TIM10      1 << 20 
-#define RCC_APB2_ENB_TIM11      1 << 21
+#define RCC_APB2_ENB_AFIO       (1 << 0)
+#define RCC_APB2_ENB_PORT_A     (1 << 2)
+#define RCC_APB2_ENB_PORT_B     (1 << 3)
+#define RCC_APB2_ENB_PORT_C     (1 << 4)
+#define RCC_APB2_ENB_PORT_D     (1 << 5)
+#define RCC_APB2_ENB_PORT_E     (1 << 6)
+#define RCC_APB2_ENB_PORT_F     (1 << 7)
+#define RCC_APB2_ENB_PORT_G     (1 << 8)
+#define RCC_APB2_ENB_ADC1       (1 << 9)
+#define RCC_APB2_ENB_ADC2       (1 << 10)
+#define RCC_APB2_ENB_TIM1       (1 << 11)
+#define RCC_APB2_ENB_SPI1       (1 << 12)
+#define RCC_APB2_ENB_TIM8       (1 << 13)
+#define RCC_APB2_ENB_USART1     (1 << 14)
+#define RCC_APB2_ENB_ADC3       (1 << 15)
+#define RCC_APB2_ENB_TIM9       (1 << 19)
+#define RCC_APB2_ENB_TIM10      (1 << 20) 
+#define RCC_APB2_ENB_TIM11      (1 << 21)
 
 
-#define RCC_AHB_ENB_DMA1        1 << 0
-#define RCC_AHB_ENB_DMA2        1 << 1
-#define RCC_AHB_ENB_SRAM        1 << 2
-#define RCC_AHB_ENB_FLASH       1 << 4
-#define RCC_AHB_ENB_CRC         1 << 6
-#define RCC_AHB_ENB_FSMC        1 << 8
-#define RCC_AHB_ENB_SDIO        1 << 10
+#define RCC_AHB_ENB_DMA1        (1 << 0)
+#define RCC_AHB_ENB_DMA2        (1 << 1)
+#define RCC_AHB_ENB_SRAM        (1 << 2)
+#define RCC_AHB_ENB_FLASH       (1 << 4)
+#define RCC_AHB_ENB_CRC         (1 << 6)
+#define RCC_AHB_ENB_FSMC        (1 << 8)
+#define RCC_AHB_ENB_SDIO        (1 << 10)
 
 
 #define RCC_CR_PLLRDY   25
@@ -110,6 +110,6 @@ void RCC_AHBDevDisable(uint32_t dev);
 
 
 void RCC_HSE_PLL_enable();
-void RCC_HSI_enable();
+void RCC_HSI_PLL_enable();
 #define RCC_BASE_ADDR ((RCC_REGS*)0x40021000)
 #endif

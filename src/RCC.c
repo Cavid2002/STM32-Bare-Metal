@@ -1,9 +1,8 @@
 #include "../include/RCC.h"
 
-void RCC_HSI_enable()
+void RCC_HSI_PLL_enable()
 {  
     RCC_BASE_ADDR->CR |= (1 << 0);
-    
     
     while(!(RCC_BASE_ADDR->CR & (1 << 1)));
     

@@ -5,84 +5,82 @@
 
 
 SPI_REGS* sd_base = SPI1_BASE;
+USART_REGS* usart_log = USART1_BASE;
 
-
-int SD_reset()
+void console_log(const char* msg)
 {
-    uint8_t status;
-    CS_high(sd_base);
-    for(int i = 0; i < 10; i++)
-    {
-        SPI_transmit_poll(sd_base, 0xFF);
-    }
-    
-    CS_low(sd_base);
-
-    status = SD_send_command(0, 0, 0x95);
-    if(status != 0x01)
-    {
-        USART_write_line(USART1_BASE, "[ERROR] SD init failed");
-        return -1;
-    }
-    
-    return 0;
+    USART_write_line(USART1_BASE, msg);
+    USART_write_line(USART1_BASE, "\r\n");
 }
-
-
 
 uint8_t SD_send_command(uint8_t cmd, uint32_t args, uint8_t crc)
 {
     uint8_t res = 0;
+    console_log("Sending Command");
+
     SPI_transmit_poll(sd_base, 0x40 | cmd);
     SPI_transmit_poll(sd_base, (args >> 24) & 0xFF);
     SPI_transmit_poll(sd_base, (args >> 16) & 0xFF);
     SPI_transmit_poll(sd_base, (args >> 8) & 0xFF);
     SPI_transmit_poll(sd_base, args & 0xFF);
-
-    for(int i = 0; i < SD_NCR; i++)
+    SPI_transmit_poll(sd_base, crc | 0x01);
+    for(int i = 0; i <= SD_NCR; i++)
     {
         res = SPI_transmit_poll(sd_base, 0xFF);
         if(!(res & 0x80)) return res; 
     }
-    USART_write_line(USART1_BASE, "COMMAND FAILED \r\n");
+    
+    console_log("COMMAND FAILED!");
     return 0xFF;
 }
 
-int SD_init()
-{
-    SD_adjust_freq(6);
-    CS_low(sd_base);
-    uint8_t res, timeout = TIMEOUT;
 
-    if(SD_reset() < 0)
+int SD_reset()
+{
+    for(int i = 0; i < 10000000; i++);
+    uint8_t status;
+    char buf[32];
+    console_log("SD RESET start...");
+    SD_adjust_freq(6);
+    CS_high();
+    for(int i = 0; i < 100; i++)
+        SPI_transmit_poll(sd_base, 0xFF);
+
+    CS_low();
+    SPI_transmit_poll(sd_base, 0xFF);
+    status = SD_send_command(0, 0, 0x95);
+
+    // print the raw byte so we can see what came back
+    buf[0] = '0';
+    buf[1] = 'x';
+    buf[2] = "0123456789ABCDEF"[(status >> 4) & 0xF];
+    buf[3] = "0123456789ABCDEF"[status & 0xF];
+    buf[4] = '\0';
+    console_log("CMD0 response: ");
+    console_log(buf);
+    if(status != 0x01)
     {
-        USART_write_line(USART1_BASE, "[ERROR] SD init failed");
+        console_log("[ERROR] SD reset failed");
+        CS_high();
         return -1;
     }
 
-    while(1)
-    {
-        SD_send_command(55, 0, 0);
-        res = SD_send_command(41, 0x40000000, 0xFF);
-        if(res == 0) break;
-        if(timeout == 0)
-        {
-            USART_write_line(USART1_BASE, "[ERROR] SD init failed");
-            return -1;
-        }
-        timeout--;
-        
-    }
-
-    CS_high(sd_base);
+    console_log("[SUCCESS] SD reset completed");
     SD_adjust_freq(0);
+    CS_high();
     return 0;
+}
+
+
+
+int SD_init()
+{
 
 }
 
 int SD_read_block(char* buff, uint32_t lba)
 {
-    CS_low(sd_base);
+    CS_low();
     int timeout = TIMEOUT, res = 0;
     uint8_t status = SD_send_command(17, lba, 0xFF);
     if(status == 0xFF) return -1;
@@ -102,13 +100,13 @@ int SD_read_block(char* buff, uint32_t lba)
 
     SPI_transmit_poll(sd_base, 0xFF);
     SPI_transmit_poll(sd_base, 0xFF);
-    CS_high(sd_base);
+    CS_high();
     return res;
 }
 
 int SD_write_block(char* buff, uint32_t lba)
 {
-    CS_low(sd_base);
+    CS_low();
     int timeout = TIMEOUT, res = 0;
     uint8_t status = SD_send_command(24, lba, 0xFF);
     if(status == 0xFF) return -1;
@@ -128,7 +126,7 @@ int SD_write_block(char* buff, uint32_t lba)
 
     status = SPI_transmit_poll(sd_base, 0xFF);
     if((status & 0x1F) != 0x05) return -1;
-    CS_high(sd_base);
+    CS_high();
     return res;
 }
 
@@ -138,5 +136,6 @@ void SD_adjust_freq(uint8_t freq)
     sd_base->CR1 &= ~(1 << 6);
     sd_base->CR1 &= ~(7 << 3);
     sd_base->CR1 |= freq << 3;
+    sd_base->CR1 |= (1 << 2) | (1 << 9) | (1 << 8);
     sd_base->CR1 |= 1 << 6;
 }
