@@ -31,6 +31,7 @@ int main()
     USART1_init(9600);
     SPI1_init();
     SD_reset();
+    SD_init();
     uint8_t res;
     USART_write_line(USART1_BASE, "testing 4\r\n");   
     while(1)
@@ -41,15 +42,15 @@ int main()
         // res = SPI_transmit_poll(SPI1_BASE, 0x55);
         // delay(1000000);
 
-        res = SPI_transmit_poll(SPI1_BASE, 0xaa);
+        // res = SPI_transmit_poll(SPI1_BASE, 0xaa);
 
-        if(res == 0xaa)
-        {
-            USART_write_line(USART1_BASE, "SPI Works\r\n");
-            continue;
-        }
+        // if(res == 0xaa)
+        // {
+        //     USART_write_line(USART1_BASE, "SPI Works\r\n");
+        //     continue;
+        // }
 
-        USART_write_line(USART1_BASE, "SPI Failed\r\n");
+        // USART_write_line(USART1_BASE, "SPI Failed\r\n");
 
 
         // if(res == 0xFF) USART_write_line(USART1_BASE, "HIGH\r\n");  

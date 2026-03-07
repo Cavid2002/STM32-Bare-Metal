@@ -16,8 +16,7 @@ void console_log(const char* msg)
 uint8_t SD_send_command(uint8_t cmd, uint32_t args, uint8_t crc)
 {
     uint8_t res = 0;
-    console_log("Sending Command");
-
+    CS_low();
     SPI_transmit_poll(sd_base, 0x40 | cmd);
     SPI_transmit_poll(sd_base, (args >> 24) & 0xFF);
     SPI_transmit_poll(sd_base, (args >> 16) & 0xFF);
@@ -27,47 +26,36 @@ uint8_t SD_send_command(uint8_t cmd, uint32_t args, uint8_t crc)
     for(int i = 0; i <= SD_NCR; i++)
     {
         res = SPI_transmit_poll(sd_base, 0xFF);
-        if(!(res & 0x80)) return res; 
+        if(!(res & 0x80)) 
+        {
+            CS_high();
+            return res;
+        } 
     }
-    
-    console_log("COMMAND FAILED!");
+    CS_high();
     return 0xFF;
 }
 
 
 int SD_reset()
 {
-    for(int i = 0; i < 10000000; i++);
-    uint8_t status;
-    char buf[32];
-    console_log("SD RESET start...");
     SD_adjust_freq(6);
+    for(int i = 0; i < 100000; i++);
+    uint8_t status;
+    console_log("SD RESET start...");
     CS_high();
     for(int i = 0; i < 100; i++)
         SPI_transmit_poll(sd_base, 0xFF);
 
-    CS_low();
-    SPI_transmit_poll(sd_base, 0xFF);
     status = SD_send_command(0, 0, 0x95);
-
-    // print the raw byte so we can see what came back
-    buf[0] = '0';
-    buf[1] = 'x';
-    buf[2] = "0123456789ABCDEF"[(status >> 4) & 0xF];
-    buf[3] = "0123456789ABCDEF"[status & 0xF];
-    buf[4] = '\0';
-    console_log("CMD0 response: ");
-    console_log(buf);
     if(status != 0x01)
     {
         console_log("[ERROR] SD reset failed");
-        CS_high();
         return -1;
     }
 
     console_log("[SUCCESS] SD reset completed");
     SD_adjust_freq(0);
-    CS_high();
     return 0;
 }
 
@@ -75,7 +63,39 @@ int SD_reset()
 
 int SD_init()
 {
+    uint8_t status;
+    uint8_t res, timeout = TIMEOUT;
 
+    while(1)
+    {
+        SD_send_command(55, 0, 0);
+        res = SD_send_command(41, 1 << 30, 0xFF);
+        if(res == 0) break;
+        if(timeout == 0)
+        {
+            console_log("[ERROR] SD init failed");
+            return -1;
+        }
+        timeout--;   
+    }
+
+
+    CS_high();
+    return 0;
+}
+
+int SD_begin()
+{
+    if(SD_reset() < 0)
+    {
+        console_log("SD Reset Failed!");
+        return -1;    
+    }
+    if(SD_init() < 0)
+    {
+        console_log("SD INIT Failed!");
+        return -1;  
+    }
 }
 
 int SD_read_block(char* buff, uint32_t lba)
