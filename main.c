@@ -5,8 +5,9 @@
 #include "./include/SD.h"
 
 
-char start[SECTOR_SIZE] = "Hello World\r\n";
+char start[SECTOR_SIZE] = "Hello from SD card\r\n";
 char temp[SECTOR_SIZE];
+char temp2[SECTOR_SIZE];
 
 
 
@@ -30,40 +31,17 @@ int main()
     
     USART1_init(9600);
     SPI1_init();
-    SD_reset();
-    SD_init();
-    uint8_t res;
-    USART_write_line(USART1_BASE, "testing 4\r\n");   
+    
+    SD_begin();
+    SD_write_block(start, 200);
+    SD_read_block(temp, 2000);
+    SD_read_block(temp2, 200);
+
+    USART_write_line(USART1_BASE, temp);
+    USART_write_line(USART1_BASE, temp2);   
     while(1)
     {
-        // SD_adjust_freq(6);
-        // CS_high();
         
-        // res = SPI_transmit_poll(SPI1_BASE, 0x55);
-        // delay(1000000);
-
-        // res = SPI_transmit_poll(SPI1_BASE, 0xaa);
-
-        // if(res == 0xaa)
-        // {
-        //     USART_write_line(USART1_BASE, "SPI Works\r\n");
-        //     continue;
-        // }
-
-        // USART_write_line(USART1_BASE, "SPI Failed\r\n");
-
-
-        // if(res == 0xFF) USART_write_line(USART1_BASE, "HIGH\r\n");  
-        // else if(res == 0x00) USART_write_line(USART1_BASE, "LOW\r\n");
-        // CS_low();
-        // delay(1000000);
-        
-        // CS_high();
-        // SD_send_command(0xFF, 0xFFFFFFFF, 0xFF);
-        // GPIO_pinToggle(GPIO_BASE_A, 1);
-        // delay(1000000);
-        // SD_send_command(0x00, 0, 0x00);
-        // delay(1000000);
     }
 }
 
