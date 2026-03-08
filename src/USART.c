@@ -44,3 +44,8 @@ void USART1_init(uint32_t baud_rate)
     USART1_BASE->CR1 |= 1 << USART_CR1_UE | 1 << USART_CR1_TE | 1 << USART_CR1_RE;
     
 }
+
+void USART1_interrupt_handler()
+{
+    
+}
