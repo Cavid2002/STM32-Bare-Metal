@@ -7,6 +7,12 @@
 #define BLOCK_SIZE              512
 #define FAT_START               2
 #define ADR_PER_BLOCK           BLOCK_SIZE / 4
+#define EOC                     0xFFFFFFFF
+
+#define SEEK_SET                0
+#define SEEK_CUR                1
+#define SEEK_END                2
+
 
 #define NULL_BLCK   0
 
