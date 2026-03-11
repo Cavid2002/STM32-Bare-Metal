@@ -1,6 +1,7 @@
 #include "../include/FAT.h"
 #include "../include/SD.h"
 #include <string.h>
+#include <stdlib.h>
 
 super_block s_block;
 uint8_t sector_buff[BLOCK_SIZE];
@@ -16,8 +17,8 @@ uint32_t alloc_block()
     {
         block_offset = i / ADR_PER_BLOCK;
         index = i % ADR_PER_BLOCK;
-        SD_read_block(sector_buff, block_offset);
-        for(j = index; j < ADR_PER_BLOCK; i++)
+        SD_read_block(sector_buff, block_offset + FAT_START);
+        for(j = index; j < ADR_PER_BLOCK; j++)
         {
             if(blk_buff[j] == 0)
             {
@@ -35,8 +36,8 @@ uint32_t alloc_block()
 void add_to_cluster(uint32_t prev, uint32_t next)
 {
     uint32_t* blk_buff = sector_buff;
-    uint32_t block_offset = prev / BLOCK_SIZE;
-    uint32_t index = prev % BLOCK_SIZE;
+    uint32_t block_offset = prev / ADR_PER_BLOCK;
+    uint32_t index = prev % ADR_PER_BLOCK;
 
     SD_read_block(blk_buff, block_offset + FAT_START);
     blk_buff[index] = next;
@@ -59,7 +60,16 @@ uint32_t file_seek(file_desc* fd, uint8_t pos, int offset)
     else if(pos == SEEK_SET) fd->offset = offset;
     else if(pos == SEEK_END) fd->offset = fd->file_size + offset;
     
-    fd->
+    if(fd->offset > fd->file_size) fd->offset = fd->file_size;
+
+    fd->curr_block = fd->start_block;
+
+    for(int i = 0; i < fd->offset / BLOCK_SIZE; i++)
+    {
+        fd->curr_block = get_next_block(fd->curr_block);
+    }
+
+    return fd->offset;
 }
 
 
@@ -82,7 +92,7 @@ int file_read(file_desc* fd, char* buff, uint32_t size)
         if(size < bytes_to_read) bytes_to_read = size;
         
         SD_read_block(sector_buff, next_block);
-        memcpy(buff, sector_buff + bytes_to_read, bytes_to_read);
+        memcpy(buff, sector_buff + internal_offset, bytes_to_read);
         
         buff += bytes_to_read;
         size -= bytes_to_read;
@@ -136,6 +146,59 @@ int file_write(file_desc* fd, char* buff, uint32_t size)
 
     }
     
-    
     return res;
+}
+
+uint32_t read_dir(uint32_t block_num, char* file)
+{
+    dir_entry* dirs = sector_buff;
+    while(block_num != EOC)
+    {
+        SD_read_block(dirs, block_num);
+        
+        for(int i = 0; i < ENT_PER_BLOCK; i++)
+        {
+            if(strncmp(dirs[i].name, file) == 0)
+            {
+                return dirs[i].block_num;
+            }
+        }
+
+        block_num = get_next_block(block_num);
+        
+    }
+
+    return FSYS_ERR_NOT_EXT;
+}
+
+file_desc* file_open(char* path, uint8_t perms, uint8_t flags)
+{
+    char* token = strtok(path, "/");
+    uint32_t next = ROOT_DIR;
+    while(token)
+    {
+        next = read_dir(next, token);
+        if(next)        
+    }
+
+
+
+}
+
+
+int file_close(file_desc* fd)
+{
+    
+
+
+}
+
+int mount()
+{
+    
+}
+
+int create_fs()
+{
+
 }
