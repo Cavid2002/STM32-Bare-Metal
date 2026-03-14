@@ -23,11 +23,22 @@ typedef struct
 } SPI_REGS;
 
 #define SPI1_BASE ((SPI_REGS*)(0x40013000))
+#define SPI2_BASE ((SPI_REGS*)(0x40003800))
 
-
+// SD card
 void SPI1_init();
 uint8_t SPI_transmit_poll(SPI_REGS* base, uint8_t data);
 void CS_low();
 void CS_high();
+
+
+// LCD screen 
+void SPI2_init();
+void SPI2_set_tx();
+void SPI2_set_rx();
+void SPI2_send_poll(uint8_t data);
+uint8_t SPI2_recieve_poll();
+void CS2_low();
+void CS2_high();
 
 #endif
