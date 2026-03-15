@@ -31,4 +31,7 @@ void lcd_init()
     lcd_send(0x36, LCD_CMD);
     lcd_data(0x00, LCD_DATA);
     
+
+    lcd_send(0x2A, LCD_CMD);
+    lcd_send()
 }

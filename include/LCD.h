@@ -7,7 +7,6 @@
 #define SCREEN_W    240
 
 
-
 #define LCD_CMD     0
 #define LCD_DATA    1
 
