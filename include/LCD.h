@@ -3,8 +3,12 @@
 
 #include <stdint.h>
 
-#define SCREEN_H    64
-#define SCREEN_W    128
+#define SCREEN_H    135
+#define SCREEN_W    240
 
+
+
+#define LCD_CMD     0
+#define LCD_DATA    1
 
 #endif

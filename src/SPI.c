@@ -23,7 +23,9 @@ void SPI2_init()
     RCC_BASE_ADDR->APB2_ENBR |= RCC_APB2_ENB_PORT_B;
 
     GPIO_BASE_B->CFGR_HIGH &= ~(0xFFFF << 16);
-    GPIO_BASE_B->CFGR_HIGH |= (0xB0B3 << 16);
+    GPIO_BASE_B->CFGR_HIGH |= (0xB3B3 << 16);
+
+    GPIO_BASE_B->DR |= (1 << 12);
 
     SPI2_BASE->CR1 |= 1 << 15;
     SPI2_BASE->CR1 |= 1 << 14;
@@ -44,6 +46,17 @@ void SPI2_set_rx()
     GPIO_BASE_B->CFGR_HIGH &= ~(0xF << 28);
     GPIO_BASE_B->CFGR_HIGH |= (0x4 << 28);
     SPI2_BASE->CR1 &= ~(1 << 14); 
+}
+
+
+void DC_high()
+{
+    GPIO_BASE_B->DR |= 1 << 14;
+}
+
+void DC_low()
+{
+    GPIO_BASE_B->DR &= ~(1 << 14);
 }
 
 void SPI2_send_poll(uint8_t data)

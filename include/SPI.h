@@ -34,6 +34,8 @@ void CS_high();
 
 // LCD screen 
 void SPI2_init();
+void DC_low();
+void DC_high();
 void SPI2_set_tx();
 void SPI2_set_rx();
 void SPI2_send_poll(uint8_t data);
