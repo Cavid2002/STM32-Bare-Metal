@@ -3,6 +3,7 @@
 #include "./include/RCC.h"
 #include "./include/USART.h"
 #include "./include/SD.h"
+#include "./include/LCD.h"
 
 
 char start[SECTOR_SIZE] = "Hello from SD card\r\n";
@@ -24,21 +25,22 @@ void delay(uint32_t delay)
 int main()
 {
     uint8_t key = 0, counter = 0;
-    RCC_HSI_PLL_enable();
+    RCC_HSE_PLL_enable();
     RCC_APB2DevEnable(RCC_APB2_ENB_PORT_A);
     GPIO_pinMode(GPIO_BASE_A, 0, GPIO_MODE_OUTPUT_10Mhz, GPIO_CFG_OUTPUT_PUSH_PULL);
     GPIO_pinMode(GPIO_BASE_A, 1, GPIO_MODE_OUTPUT_10Mhz, GPIO_CFG_OUTPUT_PUSH_PULL);
     
-    USART1_init(9600);
+    USART1_init(115200);
     SPI1_init();
     
     SD_begin();
-    SD_write_block(start, 200);
     SD_read_block(temp, 2000);
     SD_read_block(temp2, 200);
 
     USART_write_line(USART1_BASE, temp);
     USART_write_line(USART1_BASE, temp2);   
+    lcd_init();
+
     while(1)
     {
         

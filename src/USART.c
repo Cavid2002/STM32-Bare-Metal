@@ -29,7 +29,7 @@ int USART_write_line(USART_REGS* base, const char* str)
 
 void USART1_init(uint32_t baud_rate)
 {
-    uint32_t apb_clk = 36000000;
+    uint32_t apb_clk = 72000000;
     RCC_BASE_ADDR->APB2_ENBR |= RCC_APB2_ENB_USART1;
     RCC_BASE_ADDR->APB2_ENBR |= RCC_APB2_ENB_PORT_B;
     RCC_BASE_ADDR->APB2_ENBR |= RCC_APB2_ENB_AFIO;

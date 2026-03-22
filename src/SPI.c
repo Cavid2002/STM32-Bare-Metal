@@ -25,7 +25,7 @@ void SPI2_init()
     GPIO_BASE_B->CFGR_HIGH &= ~(0xFFFF << 16);
     GPIO_BASE_B->CFGR_HIGH |= (0xB3B3 << 16);
 
-    GPIO_BASE_B->DR |= (1 << 12);
+    GPIO_BASE_B->ODR |= (1 << 12);
 
     SPI2_BASE->CR1 |= 1 << 15;
     SPI2_BASE->CR1 |= 1 << 14;
@@ -51,12 +51,12 @@ void SPI2_set_rx()
 
 void DC_high()
 {
-    GPIO_BASE_B->DR |= 1 << 14;
+    GPIO_BASE_B->ODR |= 1 << 14;
 }
 
 void DC_low()
 {
-    GPIO_BASE_B->DR &= ~(1 << 14);
+    GPIO_BASE_B->ODR &= ~(1 << 14);
 }
 
 void SPI2_send_poll(uint8_t data)

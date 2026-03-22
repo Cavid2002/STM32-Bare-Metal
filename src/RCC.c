@@ -26,11 +26,11 @@ void RCC_HSE_PLL_enable()
     while (!(RCC_BASE_ADDR->CR & 1 << 17));  
     
     volatile uint32_t *FLASH_ACR = (volatile uint32_t *)0x40022000;
-    *FLASH_ACR |= (1 << 0);  
+    *FLASH_ACR |= (2 << 0);  
     
     RCC_BASE_ADDR->CFGR = 0;  
     RCC_BASE_ADDR->CFGR |= 7 << 18;   
-    RCC_BASE_ADDR->CFGR |= 1 << 17;   
+    RCC_BASE_ADDR->CFGR |= 0 << 17;   
     RCC_BASE_ADDR->CFGR |= 1 << 16;   
     RCC_BASE_ADDR->CFGR |= 4 << 8;    
     

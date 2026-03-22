@@ -42,7 +42,7 @@ uint8_t SD_get_response()
 
 int SD_reset()
 {
-    SD_adjust_freq(6);
+    SD_adjust_freq(7);
     for(int i = 0; i < 100000; i++);
     uint8_t status;
     console_log("SD RESET start...");
@@ -62,7 +62,7 @@ int SD_reset()
     }
 
     console_log("[SUCCESS] SD reset completed");
-    SD_adjust_freq(0);
+    SD_adjust_freq(1);
     return 0;
 }
 
