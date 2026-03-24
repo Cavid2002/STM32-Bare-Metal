@@ -3,11 +3,11 @@
 
 #include <stdint.h>
 
-#define SCREEN_H    135
-#define SCREEN_W    240
+#define SCREEN_H    240
+#define SCREEN_W    135
 
-#define OFF_X    40
-#define OFF_Y    52
+#define OFF_X    52
+#define OFF_Y    40
 
 
 
@@ -24,7 +24,7 @@ void LCD_init();
 void LCD_move_cursor(uint16_t x0, uint16_t y0, 
     uint16_t x1, uint16_t y1);
 
-void LCD_put_pixel(uint16_t pixel);
+void LCD_put_pixel(uint16_t x, uint16_t y, uint16_t color);
 
 void LCD_clear_screen(uint16_t color);
 

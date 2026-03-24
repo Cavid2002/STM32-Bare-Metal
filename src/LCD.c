@@ -35,6 +35,11 @@ void LCD_init()
     LCD_cmd(0x11);
     LCD_delay(1000000);
 
+    LCD_cmd(0x21);
+
+    LCD_cmd(0x36);
+    LCD_data(0x00);
+
     LCD_cmd(0x3A);
     LCD_data(0x55);
 
@@ -43,7 +48,6 @@ void LCD_init()
     LCD_cmd(0x29);
     LCD_cmd(0x38);
 
-    LCD_cmd(0x21);
     USART_write_line(USART1_BASE, "LCD init ended!\r\n");
 }
 
@@ -65,10 +69,11 @@ void LCD_move_cursor(uint16_t x0, uint16_t y0,
 }
 
 
-void LCD_put_pixel(uint16_t pixel)
+void LCD_put_pixel(uint16_t x, uint16_t y, uint16_t color)
 {
-    LCD_data(pixel >> 8);
-    LCD_data(pixel & 0xFF);
+    LCD_move_cursor(x, y, x, y);
+    LCD_data(color >> 8);
+    LCD_data(color & 0xFF);
 }
 
 void LCD_clear_screen(uint16_t color)
@@ -78,7 +83,8 @@ void LCD_clear_screen(uint16_t color)
     {
         for(int j = 0; j < SCREEN_W; j++)
         {
-            LCD_put_pixel(color);
+            LCD_data(color >> 8);
+            LCD_data(color & 0xFF);
         }
     }
 

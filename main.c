@@ -40,11 +40,15 @@ int main()
     LCD_init();
     LCD_clear_screen(0xFFFF);
 
-    USART_write_line(USART1_BASE, temp);
+    USART_write_line(USART1_BASE, start);
 
     while(1)
     {
-        // SPI2_send_poll(0x50);
+        LCD_clear_screen(0xFFFF);
+        LCD_clear_screen(0xFFF0);
+        LCD_clear_screen(0xFF00);
+        LCD_clear_screen(0xF000);
+        LCD_clear_screen(0x0000);
     }
 }
 
