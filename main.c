@@ -32,18 +32,19 @@ int main()
     
     USART1_init(115200);
     SPI1_init();
-    
+    SPI2_init();
+
     SD_begin();
-    SD_read_block(temp, 2000);
-    SD_read_block(temp2, 200);
+    SD_read_block(temp, 200);
+       
+    LCD_init();
+    LCD_clear_screen(0xFFFF);
 
     USART_write_line(USART1_BASE, temp);
-    USART_write_line(USART1_BASE, temp2);   
-    lcd_init();
 
     while(1)
     {
-        
+        // SPI2_send_poll(0x50);
     }
 }
 

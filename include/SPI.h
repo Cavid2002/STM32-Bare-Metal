@@ -36,11 +36,10 @@ void CS_high();
 void SPI2_init();
 void DC_low();
 void DC_high();
-void SPI2_set_tx();
-void SPI2_set_rx();
 void SPI2_send_poll(uint8_t data);
-uint8_t SPI2_recieve_poll();
 void CS2_low();
 void CS2_high();
+void RST_low();
+void RST_high();
 
 #endif

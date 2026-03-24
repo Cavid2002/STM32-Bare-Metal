@@ -1,12 +1,13 @@
 #include "../include/LCD.h"
 #include "../include/SPI.h"
+#include "../include/USART.h"
 
-void lcd_delay(uint32_t delay)
+void LCD_delay(uint32_t delay)
 {
     for(uint32_t i = 0; i < delay; i++);
 }
 
-void lcd_cmd(uint8_t cmd)
+void LCD_cmd(uint8_t cmd)
 {
     DC_low();
     CS2_low();
@@ -14,66 +15,74 @@ void lcd_cmd(uint8_t cmd)
     CS2_high();
 }
 
-void lcd_data(uint8_t data)
+void LCD_data(uint8_t data)
 {
-    DC_low();
+    DC_high();
     CS2_low();
     SPI2_send_poll(data);
     CS2_high();
 }
 
-void lcd_init()
+void LCD_init()
 {
-    lcd_cmd(0x01);
-    lcd_delay(10000);
+    RST_low();
+    LCD_delay(1000000);
+    RST_high();
     
-    lcd_cmd(0x11);
-    lcd_delay(10000);
-
-    lcd_cmd(0x3A);
-    lcd_data(0x55);
-
-    lcd_cmd(0x36);
-    lcd_data(0x60);
+    LCD_cmd(0x01);
+    LCD_delay(1000000);
     
-    lcd_cmd(0x21);
-    lcd_cmd(0x29);
+    LCD_cmd(0x11);
+    LCD_delay(1000000);
+
+    LCD_cmd(0x3A);
+    LCD_data(0x55);
+
+    LCD_cmd(0x13);
+
+    LCD_cmd(0x29);
+    LCD_cmd(0x38);
+
+    LCD_cmd(0x21);
+    USART_write_line(USART1_BASE, "LCD init ended!\r\n");
 }
 
 
-void lcd_move_cursor(uint16_t x0, uint16_t y0, 
+void LCD_move_cursor(uint16_t x0, uint16_t y0, 
     uint16_t x1, uint16_t y1)
 {
     x0 += OFF_X; x1 += OFF_X;
     y0 += OFF_Y; y1 += OFF_Y;
-    lcd_cmd(0x2A);
-    lcd_data(x0 >> 8); lcd_data(x0 & 0xFF);
-    lcd_data(x1 >> 8); lcd_data(x1 & 0xFF);
+    LCD_cmd(0x2A);
+    LCD_data(x0 >> 8); LCD_data(x0 & 0xFF);
+    LCD_data(x1 >> 8); LCD_data(x1 & 0xFF);
     
-    lcd_cmd(0x2B);
-    lcd_data(y0 >> 8); lcd_data(y0 & 0xFF);
-    lcd_data(y1 >> 8); lcd_data(y1 & 0xFF);
+    LCD_cmd(0x2B);
+    LCD_data(y0 >> 8); LCD_data(y0 & 0xFF);
+    LCD_data(y1 >> 8); LCD_data(y1 & 0xFF);
 
-    lcd_cmd(0x2C);
+    LCD_cmd(0x2C);
 }
 
 
-void lcd_put_pixel(uint16_t pixel)
+void LCD_put_pixel(uint16_t pixel)
 {
-    lcd_data(pixel >> 8);
-    lcd_data(pixel & 0xFF);
+    LCD_data(pixel >> 8);
+    LCD_data(pixel & 0xFF);
 }
 
-void lcd_clear_screen(uint16_t color)
+void LCD_clear_screen(uint16_t color)
 {
-    lcd_move_cursor(0, 0, SCREEN_W, SCREEN_H);
+    LCD_move_cursor(0, 0, SCREEN_W - 1, SCREEN_H - 1);
     for(int i = 0; i < SCREEN_H; i++)
     {
         for(int j = 0; j < SCREEN_W; j++)
         {
-            lcd_put_pixel(color);
+            LCD_put_pixel(color);
         }
     }
+
+    USART_write_line(USART1_BASE, "Clear Screen Done!\r\n");
 }
 
 
