@@ -49,6 +49,9 @@ int main()
         LCD_clear_screen(0xFF00);
         LCD_clear_screen(0xF000);
         LCD_clear_screen(0x0000);
+        LCD_clear_screen(0x000F);
+        LCD_clear_screen(0x00FF);
+        LCD_clear_screen(0x0FFF);
     }
 }
 

@@ -7,7 +7,7 @@
 #define BLOCK_SIZE              512
 #define FAT_START               2
 #define ADR_PER_BLOCK           (BLOCK_SIZE / 4)
-#define ENT_PER_BLOCK           (BLOCK_SIZE / 32)
+#define DIR_PER_BLOCK           (BLOCK_SIZE / 32)
 #define MAX_FILE_NAME           20
 #define EOC                     0xFFFFFFFF
 
@@ -19,6 +19,8 @@
 #define NULL_BLCK               0
 #define FSYS_ERR_NOT_EXT        1
 #define FSYS_ERR_NO_SPC         2
+
+#define ROOT_DIR                2
 
 
 typedef struct

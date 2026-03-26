@@ -156,9 +156,9 @@ uint32_t read_dir(uint32_t block_num, char* file)
     {
         SD_read_block(dirs, block_num);
         
-        for(int i = 0; i < ENT_PER_BLOCK; i++)
+        for(int i = 0; i < DIR_PER_BLOCK; i++)
         {
-            if(strncmp(dirs[i].name, file) == 0)
+            if(strncmp(dirs[i].name, file, strlen(file)) == 0)
             {
                 return dirs[i].block_num;
             }
@@ -178,10 +178,11 @@ file_desc* file_open(char* path, uint8_t perms, uint8_t flags)
     while(token)
     {
         next = read_dir(next, token);
-        if(next)        
+        if(next == FSYS_ERR_NOT_EXT) return NULL;
+        token = strtok(NULL, "/");
     }
-
-
+    
+    file_write();
 
 }
 

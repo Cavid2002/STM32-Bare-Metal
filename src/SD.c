@@ -81,15 +81,12 @@ int SD_init()
         console_log("[ERROR] SD init failed at reset");
         return -1;
     }
-
-    /* CMD8 - Send Interface Condition (detect SDv2) */
     CS_low();
     SD_send_command(8, 0x1AA, 0x87);
     status = SD_get_response();
 
     if (status == 0x01)
     {
-        /* SDv2 - read remaining 4 bytes of R7 response */
         ocr[0] = SPI_transmit_poll(sd_base, 0xFF);
         ocr[1] = SPI_transmit_poll(sd_base, 0xFF);
         ocr[2] = SPI_transmit_poll(sd_base, 0xFF);
@@ -102,11 +99,10 @@ int SD_init()
             return -1;
         }
 
-        /* ACMD41 loop - wait for card to leave idle (SDv2, HCS=1) */
         timeout = 0;
         do {
             CS_low();
-            SD_send_command(55, 0, 0x65);   /* CMD55 - APP_CMD */
+            SD_send_command(55, 0, 0x65);
             status = SD_get_response();
             CS_high();
 
@@ -117,7 +113,7 @@ int SD_init()
             }
 
             CS_low();
-            SD_send_command(41, 0x40000000, 0x77);  /* ACMD41 HCS=1 */
+            SD_send_command(41, 0x40000000, 0x77);
             status = SD_get_response();
             CS_high();
 
@@ -129,7 +125,6 @@ int SD_init()
 
         } while (status == 0x01);
 
-        /* CMD58 - Read OCR, check CCS bit for SDHC/SDXC */
         CS_low();
         SD_send_command(58, 0, 0xFD);
         status = SD_get_response();
@@ -149,7 +144,6 @@ int SD_init()
     }
     else
     {
-        /* SDv1 or MMC - ACMD41 without HCS */
         CS_high();
         timeout = 0;
         do {
@@ -174,7 +168,6 @@ int SD_init()
         sd_card_type = SD_TYPE_SDSC;
     }
 
-    /* CMD16 - Force block size to 512 (required for SDSC) */
     if (sd_card_type == SD_TYPE_SDSC)
     {
         CS_low();

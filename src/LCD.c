@@ -23,6 +23,12 @@ void LCD_data(uint8_t data)
     CS2_high();
 }
 
+void LCD_screen_adjust()
+{
+    LCD_cmd(0x36);
+    LCD_data(0x60);
+}
+
 void LCD_init()
 {
     RST_low();
@@ -37,9 +43,6 @@ void LCD_init()
 
     LCD_cmd(0x21);
 
-    LCD_cmd(0x36);
-    LCD_data(0x00);
-
     LCD_cmd(0x3A);
     LCD_data(0x55);
 
@@ -48,6 +51,7 @@ void LCD_init()
     LCD_cmd(0x29);
     LCD_cmd(0x38);
 
+    LCD_screen_adjust();
     USART_write_line(USART1_BASE, "LCD init ended!\r\n");
 }
 
@@ -78,7 +82,7 @@ void LCD_put_pixel(uint16_t x, uint16_t y, uint16_t color)
 
 void LCD_clear_screen(uint16_t color)
 {
-    LCD_move_cursor(0, 0, SCREEN_W - 1, SCREEN_H - 1);
+    LCD_move_cursor(0, 0, SCREEN_W, SCREEN_H);
     for(int i = 0; i < SCREEN_H; i++)
     {
         for(int j = 0; j < SCREEN_W; j++)

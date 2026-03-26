@@ -3,11 +3,11 @@
 
 #include <stdint.h>
 
-#define SCREEN_H    240
-#define SCREEN_W    135
+#define SCREEN_H    135
+#define SCREEN_W    240
 
-#define OFF_X    52
-#define OFF_Y    40
+#define OFF_Y    53
+#define OFF_X    40
 
 
 
