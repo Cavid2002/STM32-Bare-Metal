@@ -175,8 +175,10 @@ file_desc* file_open(char* path, uint8_t perms, uint8_t flags)
 {
     char* token = strtok(path, "/");
     uint32_t next = ROOT_DIR;
+    uint32_t prev = next;
     while(token)
     {
+        prev = next;
         next = read_dir(next, token);
         if(next == FSYS_ERR_NOT_EXT) return NULL;
         token = strtok(NULL, "/");

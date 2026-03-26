@@ -11,7 +11,7 @@ extern uint32_t _estack;
 extern int main();
 void _reset();
 
-uint32_t vector_table[60] __attribute__((section(".vector"))) = 
+uint32_t vector_table[84] __attribute__((section(".vector"))) = 
 {
 	(uint32_t)&_estack,
 	(uint32_t)_reset

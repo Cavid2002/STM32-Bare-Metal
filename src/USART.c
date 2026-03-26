@@ -3,6 +3,9 @@
 #include "../include/AFIO.h"
 #include "../include/GPIO.h"
 
+char key_buff[8];
+uint8_t read_ptr = 0;
+uint8_t write_prt = 0;
 
 void USART_write_poll(USART_REGS* base, uint8_t c)
 {
@@ -42,6 +45,12 @@ void USART1_init(uint32_t baud_rate)
     GPIO_BASE_B->CFGR_LOW |= 0b0100 << 28;
 
     USART1_BASE->CR1 |= 1 << USART_CR1_UE | 1 << USART_CR1_TE | 1 << USART_CR1_RE;
+    
+}
+
+
+void USART1_interrupt_enable()
+{
     
 }
 
