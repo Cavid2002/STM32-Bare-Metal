@@ -4,10 +4,11 @@
 #include "../include/GPIO.h"
 #include "../include/NVIC.h"
 #include <string.h>
+#include <stdlib.h>
 
 volatile char char_buff[USART_BUFF_SIZE];
-volatile uint8_t read_ptr = 0;
-volatile uint8_t write_prt = 0;
+volatile uint16_t read_ptr = 0;
+volatile uint16_t write_prt = 0;
 
 void USART_write_poll(USART_REGS* base, uint8_t c)
 {
@@ -49,16 +50,28 @@ uint8_t USART1_read_char()
     return res;
 }
 
-int USART1_write_line(const char* str)
+uint16_t USART1_write(char* buff, uint16_t size)
 {
-    int i = 0;
-    while(str[i])
+    uint16_t i = 0;
+    for(i = 0; i < size; i++)
     {
-        char_buff[write_prt % USART_BUFF_SIZE] = str[i];
+        if(USART_BUFF_SIZE <= write_prt - read_ptr) break;
+        char_buff[write_prt % USART_BUFF_SIZE] = buff[i];
         write_prt++;
-        i++;
     }
     USART1_BASE->CR1 |= (USART_CR1_TXEIE);
+    return i;
+}
+
+int USART1_write_line(const char* str)
+{
+    uint16_t size = strlen(str);
+    uint16_t sum = 0;
+    while(1)
+    {
+        sum += USART1_write((char*)(str + sum), size - sum);
+    }
+    return sum;
 }
 
 void USART1_init(uint32_t baud_rate)
@@ -99,6 +112,5 @@ void USART1_interrupt_handler()
     {
         if(read_ptr != write_prt) USART1_BASE->DR = USART1_read_char();
         else USART1_BASE->CR1 &= ~(USART_CR1_TXEIE);
-        
     }
 }

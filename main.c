@@ -32,15 +32,20 @@ int main()
     GPIO_pinToggle(GPIO_BASE_A, 1);    
     
     USART1_init(115200);
-    
-    SD_begin();
-    SD_read_block(temp, 200);    
+    SPI1_init();
+    // SD_begin();
+    // SD_read_block(temp, 2000);    
     USART1_interrupt_enable();
-    USART1_write_line(temp);
+    // USART1_write_line(start);
+
+    // USART1_write_line(temp);
+    
+
     while(1)
     {
-        GPIO_pinToggle(GPIO_BASE_A, 0);
-        delay(1000000);
+        USART1_write_line(start);
+        // GPIO_pinToggle(GPIO_BASE_A, 0);
+        // delay(1000000);
     }
 }
 
