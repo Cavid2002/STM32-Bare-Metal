@@ -4,12 +4,12 @@
 
 void NVIC_enable_irq(uint32_t irq_num)
 {
-    NVIC_BASE->ISER[irq_num / 32] = 1 << (irq_num % 32);
+    NVIC_BASE->ISER[irq_num / 32] |= 1 << (irq_num % 32);
 }
 
 void NVIC_disable_irq(uint32_t irq_num)
 {
-    NVIC_BASE->ICER[irq_num / 32] = 1 << (irq_num % 32);
+    NVIC_BASE->ICER[irq_num / 32] |= 1 << (irq_num % 32);
 }
 
 uint32_t NVIC_get_enable(uint32_t irq_num)
@@ -50,9 +50,4 @@ uint8_t NVIC_get_priority(uint32_t irq_num)
     uint32_t index = irq_num / 4;
     uint32_t offset = irq_num % 4;
     return (NVIC_BASE->IPR[index] >> (offset * 8)) & 0xFF;
-}
-
-void NVIC_asign_isr(uint32_t index, uint32_t isr_addr)
-{
-    vector_table[index] = isr_addr;
 }

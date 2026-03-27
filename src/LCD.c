@@ -1,6 +1,5 @@
 #include "../include/LCD.h"
 #include "../include/SPI.h"
-#include "../include/USART.h"
 
 void LCD_delay(uint32_t delay)
 {
@@ -52,7 +51,6 @@ void LCD_init()
     LCD_cmd(0x38);
 
     LCD_screen_adjust();
-    USART_write_line(USART1_BASE, "LCD init ended!\r\n");
 }
 
 
@@ -91,8 +89,6 @@ void LCD_clear_screen(uint16_t color)
             LCD_data(color & 0xFF);
         }
     }
-
-    USART_write_line(USART1_BASE, "Clear Screen Done!\r\n");
 }
 
 

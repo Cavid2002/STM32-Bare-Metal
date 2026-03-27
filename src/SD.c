@@ -10,8 +10,8 @@ uint8_t sd_card_type;
 
 void console_log(const char* msg)
 {
-    USART_write_line(USART1_BASE, msg);
-    USART_write_line(USART1_BASE, "\r\n");
+    USART1_write_line(msg);
+    USART1_write_line("\r\n");
 }
 
 void SD_send_command(uint8_t cmd, uint32_t args, uint8_t crc)

@@ -3,19 +3,21 @@
 #define RESET_H
 
 #include <stdint.h>
+#include "../include/USART.h"
 
 extern uint32_t _sbss, _ebss;
 extern uint32_t _sdata, _edata, _ldata;
 extern uint32_t _estack;
 
 extern int main();
-void _reset();
+extern void _reset();
+extern void USART1_interrupt_handler();
 
 uint32_t vector_table[84] __attribute__((section(".vector"))) = 
 {
-	(uint32_t)&_estack,
-	(uint32_t)_reset
-
+	[0] = (uint32_t)&_estack,
+	[1] = (uint32_t)_reset,
+	[53] = (uint32_t)USART1_interrupt_handler,
 };
 
 

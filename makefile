@@ -2,11 +2,12 @@ CC = arm-none-eabi-gcc
 LD = arm-none-eabi-gcc
 OBJCPY = arm-none-eabi-objcopy
 
-CFLAGS = -c -mcpu=cortex-m3
-LDFLAGS = -T linker.ld -nostartfiles -nostdlib -lgcc 
+CFLAGS = -c -mcpu=cortex-m3 -mthumb
+LDFLAGS = -T linker.ld -nostartfiles -nostdlib -lgcc -mthumb -mcpu=cortex-m3
 
 OBJS = ./bin/main.o ./bin/reset.o ./bin/GPIO.o ./bin/RCC.o \
-		./bin/USART.o ./bin/SD.o ./bin/SPI.o ./bin/LCD.o
+		./bin/USART.o ./bin/SD.o ./bin/SPI.o ./bin/LCD.o \
+		./bin/NVIC.o
 
 all: firmware.bin
 
@@ -44,6 +45,10 @@ firmware.elf: $(OBJS)
 
 ./bin/LCD.o: ./src/LCD.c ./include/LCD.h
 	$(CC) $(CFLAGS) $< -o $@
+
+./bin/NVIC.o: ./src/NVIC.c ./include/NVIC.h
+	$(CC) $(CFLAGS) $< -o $@
+
 
 .PHONY: clean flash-unix flash-windows dasm
 

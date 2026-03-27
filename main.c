@@ -6,7 +6,7 @@
 #include "./include/LCD.h"
 
 
-char start[SECTOR_SIZE] = "Hello from SD card\r\n";
+char start[SECTOR_SIZE] = "Hello from SD card\n\r";
 char temp[SECTOR_SIZE];
 char temp2[SECTOR_SIZE];
 
@@ -29,29 +29,18 @@ int main()
     RCC_APB2DevEnable(RCC_APB2_ENB_PORT_A);
     GPIO_pinMode(GPIO_BASE_A, 0, GPIO_MODE_OUTPUT_10Mhz, GPIO_CFG_OUTPUT_PUSH_PULL);
     GPIO_pinMode(GPIO_BASE_A, 1, GPIO_MODE_OUTPUT_10Mhz, GPIO_CFG_OUTPUT_PUSH_PULL);
+    GPIO_pinToggle(GPIO_BASE_A, 1);    
     
     USART1_init(115200);
-    SPI1_init();
-    SPI2_init();
-
+    
     SD_begin();
-    SD_read_block(temp, 200);
-       
-    LCD_init();
-    LCD_clear_screen(0xFFFF);
-
-    USART_write_line(USART1_BASE, start);
-
+    SD_read_block(temp, 200);    
+    USART1_interrupt_enable();
+    USART1_write_line(temp);
     while(1)
     {
-        LCD_clear_screen(0xFFFF);
-        LCD_clear_screen(0xFFF0);
-        LCD_clear_screen(0xFF00);
-        LCD_clear_screen(0xF000);
-        LCD_clear_screen(0x0000);
-        LCD_clear_screen(0x000F);
-        LCD_clear_screen(0x00FF);
-        LCD_clear_screen(0x0FFF);
+        GPIO_pinToggle(GPIO_BASE_A, 0);
+        delay(1000000);
     }
 }
 

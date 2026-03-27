@@ -2,32 +2,63 @@
 #include "../include/RCC.h"
 #include "../include/AFIO.h"
 #include "../include/GPIO.h"
+#include "../include/NVIC.h"
+#include <string.h>
 
-char key_buff[8];
-uint8_t read_ptr = 0;
-uint8_t write_prt = 0;
+volatile char char_buff[USART_BUFF_SIZE];
+volatile uint8_t read_ptr = 0;
+volatile uint8_t write_prt = 0;
 
 void USART_write_poll(USART_REGS* base, uint8_t c)
 {
-    while(!(base->SR & (1 << USART_STATUS_TC)));
+    while(!(base->SR & USART_STATUS_TXE));
     base->DR = c;
 }
 
 uint8_t USART_read_poll(USART_REGS* base)
 {
-    while(!(base->SR & (1 << USART_STATUS_RXNE)));
+    while(!(base->SR & USART_STATUS_RXNE));
     return base->DR;
 }
 
 
-int USART_write_line(USART_REGS* base, const char* str)
+void USART1_write_char(uint8_t c)
+{
+    if(c == '\r')
+    {
+        char_buff[write_prt % USART_BUFF_SIZE] = '\n';
+        write_prt++;    
+    }
+    
+    char_buff[write_prt % USART_BUFF_SIZE] = c;
+    write_prt++;
+    
+    if(c == '\b')
+    {
+        char_buff[write_prt % USART_BUFF_SIZE] = ' ';
+        write_prt++;
+        char_buff[write_prt % USART_BUFF_SIZE] = '\b';
+        write_prt++;
+    } 
+}
+
+uint8_t USART1_read_char()
+{
+    uint8_t res = char_buff[read_ptr % USART_BUFF_SIZE];
+    read_ptr++;
+    return res;
+}
+
+int USART1_write_line(const char* str)
 {
     int i = 0;
     while(str[i])
     {
-        USART_write_poll(base, str[i]);
+        char_buff[write_prt % USART_BUFF_SIZE] = str[i];
+        write_prt++;
         i++;
     }
+    USART1_BASE->CR1 |= (USART_CR1_TXEIE);
 }
 
 void USART1_init(uint32_t baud_rate)
@@ -44,17 +75,30 @@ void USART1_init(uint32_t baud_rate)
     GPIO_BASE_B->CFGR_LOW |= 0b1011 << 24;
     GPIO_BASE_B->CFGR_LOW |= 0b0100 << 28;
 
-    USART1_BASE->CR1 |= 1 << USART_CR1_UE | 1 << USART_CR1_TE | 1 << USART_CR1_RE;
+    USART1_BASE->CR1 |= USART_CR1_UE | USART_CR1_TE | USART_CR1_RE;
     
 }
 
 
 void USART1_interrupt_enable()
 {
-    
+    NVIC_enable_irq(USART1_IVT_INDEX);
+    USART1_BASE->CR1 |= USART_CR1_RXNEIE;
+    USART1_BASE->CR1 |= USART_CR1_TXEIE;
 }
 
 void USART1_interrupt_handler()
 {
-    
+    if(USART1_BASE->SR & USART_STATUS_RXNE)
+    {
+        USART1_write_char(USART1_BASE->DR);
+        USART1_BASE->CR1 |= USART_CR1_TXEIE;
+    }
+
+    if(USART1_BASE->SR & USART_STATUS_TXE)
+    {
+        if(read_ptr != write_prt) USART1_BASE->DR = USART1_read_char();
+        else USART1_BASE->CR1 &= ~(USART_CR1_TXEIE);
+        
+    }
 }
