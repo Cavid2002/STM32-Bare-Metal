@@ -3,7 +3,7 @@
 #include "../include/SD.h"
 
 
-
+uint8_t sector_buff[SECTOR_SIZE];
 SPI_REGS* sd_base = SPI1_BASE;
 USART_REGS* usart_log = USART1_BASE;
 uint8_t sd_card_type;

@@ -4,7 +4,6 @@
 
 super_block s_block;
 uint32_t bitmap_buff[BLOCK_SIZE / 4];
-uint8_t sector_buff[BLOCK_SIZE];
 
 uint32_t alloc_block()
 {

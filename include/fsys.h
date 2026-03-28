@@ -2,10 +2,10 @@
 #define FSYS_H
 
 #include <stdint.h>
+#include "../include/SD.h"
 
 #define FILE_NAME_MAX  26
 #define INODE_SIZE     32
-#define BLOCK_SIZE     512
 #define BITS_PER_BLOCK (BLOCK_SIZE << 3)
 
 #define DIRECT_BLOCK    3

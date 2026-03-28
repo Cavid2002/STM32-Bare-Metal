@@ -5,10 +5,10 @@
 
 typedef struct
 {
-    volatile uint32_t CCR1;
-    volatile uint32_t CNDTR1;
-    volatile uint32_t CPAR1;
-    volatile uint32_t CMAR1;
+    volatile uint32_t CCR;
+    volatile uint32_t CNDTR;
+    volatile uint32_t CPAR;
+    volatile uint32_t CMAR;
     volatile uint32_t _reserved;
 } DMA_CHANNEL;
 

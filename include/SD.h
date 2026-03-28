@@ -15,10 +15,12 @@
 
 #define SD_NCR       8
 #define DATA_TOKEN   0xFE
-#define SECTOR_SIZE  512
+#define BLOCK_SIZE   512
 #define FREQ_400Khz  6
 #define FREQ_18Mhz  1
 
+
+extern uint8_t sector_buff[];
 extern SPI_REGS* sd_base;
 int SD_init();
 int SD_write_block(char* buff, uint32_t lba);
