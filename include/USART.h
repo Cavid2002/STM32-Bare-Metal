@@ -63,6 +63,8 @@ void USART1_init(uint32_t baud_rate);
 int USART1_write_line(const char* str);
 void USART1_interrupt_handler();
 void USART1_interrupt_enable();
+uint16_t USART1_write(char* buff, uint16_t size);
+uint16_t USART1_read(char* buff, uint16_t size);
 
 
 #define USART1_BASE ((USART_REGS*)0x40013800)

@@ -7,8 +7,6 @@
 
 
 char start[SECTOR_SIZE] = "Hello from SD card\n\r";
-char temp[SECTOR_SIZE];
-char temp2[SECTOR_SIZE];
 
 
 
@@ -32,20 +30,16 @@ int main()
     GPIO_pinToggle(GPIO_BASE_A, 1);    
     
     USART1_init(115200);
-    SPI1_init();
-    // SD_begin();
-    // SD_read_block(temp, 2000);    
     USART1_interrupt_enable();
-    // USART1_write_line(start);
+    SPI1_init();
 
-    // USART1_write_line(temp);
-    
-
+    SD_begin();
+    SD_read_block(temp, 200);    
+    USART1_write_line(temp);
     while(1)
     {
-        USART1_write_line(start);
-        // GPIO_pinToggle(GPIO_BASE_A, 0);
-        // delay(1000000);
+        GPIO_pinToggle(GPIO_BASE_A, 0);
+        delay(1000000);
     }
 }
 

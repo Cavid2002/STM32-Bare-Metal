@@ -2,8 +2,8 @@ CC = arm-none-eabi-gcc
 LD = arm-none-eabi-gcc
 OBJCPY = arm-none-eabi-objcopy
 
-CFLAGS = -c -mcpu=cortex-m3 -mthumb
-LDFLAGS = -T linker.ld -nostartfiles -nostdlib -lgcc -mthumb -mcpu=cortex-m3
+CFLAGS = -c -mcpu=cortex-m3 -mthumb -std=gnu11
+LDFLAGS = -T linker.ld -nostartfiles --specs=nano.specs
 
 OBJS = ./bin/main.o ./bin/reset.o ./bin/GPIO.o ./bin/RCC.o \
 		./bin/USART.o ./bin/SD.o ./bin/SPI.o ./bin/LCD.o \

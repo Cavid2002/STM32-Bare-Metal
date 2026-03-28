@@ -4,7 +4,6 @@
 #include "../include/GPIO.h"
 #include "../include/NVIC.h"
 #include <string.h>
-#include <stdlib.h>
 
 volatile char char_buff[USART_BUFF_SIZE];
 volatile uint16_t read_ptr = 0;
@@ -63,12 +62,25 @@ uint16_t USART1_write(char* buff, uint16_t size)
     return i;
 }
 
+uint16_t USART1_read(char* buff, uint16_t size)
+{
+    uint16_t i = 0;
+    for(i = 0; i < size; i++)
+    {
+        if(write_prt - read_ptr <= 0) break;
+        buff[i] = char_buff[read_ptr % USART_BUFF_SIZE];
+        read_ptr++;
+    }
+    return i;
+}
+
 int USART1_write_line(const char* str)
 {
     uint16_t size = strlen(str);
     uint16_t sum = 0;
     while(1)
     {
+        if(sum == size) break;
         sum += USART1_write((char*)(str + sum), size - sum);
     }
     return sum;
