@@ -1,9 +1,9 @@
 #include "../include/SPI.h"
 #include "../include/USART.h"
 #include "../include/SD.h"
+#include "../include/DMA.h"
 
-
-uint8_t sector_buff[SECTOR_SIZE];
+uint8_t sector_buff[BLOCK_SIZE + 2] = {[512] = 0xFF, [513] = 0xFF};
 SPI_REGS* sd_base = SPI1_BASE;
 USART_REGS* usart_log = USART1_BASE;
 uint8_t sd_card_type;
@@ -171,7 +171,7 @@ int SD_init()
     if (sd_card_type == SD_TYPE_SDSC)
     {
         CS_low();
-        SD_send_command(16, SECTOR_SIZE, 0xFF);
+        SD_send_command(16, BLOCK_SIZE, 0xFF);
         status = SD_get_response();
         CS_high();
 
@@ -201,6 +201,7 @@ int SD_begin()
     return 0;
 }
 
+
 int SD_read_block(char* buff, uint32_t lba)
 {
     uint8_t status;
@@ -227,7 +228,7 @@ int SD_read_block(char* buff, uint32_t lba)
         timeout--;
     }
 
-    for(int i = 0; i < SECTOR_SIZE; i++)
+    for(int i = 0; i < BLOCK_SIZE; i++)
     {
         buff[i] = SPI_transmit_poll(sd_base, 0xFF);
     }
@@ -255,7 +256,7 @@ int SD_write_block(char* buff, uint32_t lba)
 
 
     SPI_transmit_poll(sd_base, 0xFE);
-    for(int i = 0; i < SECTOR_SIZE; i++)
+    for(int i = 0; i < BLOCK_SIZE; i++)
     {
         SPI_transmit_poll(sd_base, buff[i]);
     }
@@ -265,7 +266,7 @@ int SD_write_block(char* buff, uint32_t lba)
     
     status = SPI_transmit_poll(sd_base, 0xFF);
 
-    if((status & 0x0F) != 0x05)
+    if((status & 0x1F) != 0x05)
     {
         CS_high();
         console_log("Write error");
@@ -275,6 +276,49 @@ int SD_write_block(char* buff, uint32_t lba)
     CS_high();
     return 512;
 }
+
+int SDA_dma_enque(char* buff, uint32_t lba, uint16_t size, uint8_t op)
+{
+    
+    if(dma_write_ptr - dma_read_ptr >= DMA1_QUEUE_SIZE) return 0;
+    if(size > 512) size = 512;
+    uint8_t index = dma_write_ptr % DMA1_QUEUE_SIZE;
+    dma_write_ptr++;
+    dma_queue[index].buff = buff;
+    dma_queue[index].size = size;
+    dma_queue[index].lba = lba;
+    dma_queue[index].dma_op = op;
+    dma_queue[index].done = 0;
+
+    if(dma_write_ptr - dma_read_ptr == 1)
+    {
+        if(DMA1_start_next())
+            DMA1_enable();
+    }
+    
+}
+
+int SD_dma_write(char* buff, uint32_t lba, uint16_t size)
+{
+    return SDA_dma_enque(buff, lba, size, CMD_SD_WRITE);
+}
+
+
+
+int SD_dma_read(uint8_t* buff, uint32_t lba, uint16_t size)
+{
+    uint8_t index = dma_write_ptr % DMA1_QUEUE_SIZE;
+
+    if(!SD_dma_enqueue(buff, lba, size, CMD_SD_READ)) return 0;
+
+    while(!dma_queue[index].done);  
+    dma_queue[index].done = 0;
+
+    return 1;
+}
+
+
+
 
 void SD_adjust_freq(uint8_t freq)
 {

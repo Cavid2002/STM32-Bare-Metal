@@ -4,7 +4,6 @@
 #include <stdint.h>
 
 #define FILE_NAME_MAX           20
-#define BLOCK_SIZE              512
 #define FAT_START               2
 #define ADR_PER_BLOCK           (BLOCK_SIZE / 4)
 #define DIR_PER_BLOCK           (BLOCK_SIZE / 32)

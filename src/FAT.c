@@ -4,7 +4,6 @@
 #include <stdlib.h>
 
 super_block s_block;
-uint8_t sector_buff[BLOCK_SIZE];
 
 uint32_t alloc_block()
 {
@@ -123,7 +122,7 @@ int file_write(file_desc* fd, char* buff, uint32_t size)
         if(size < bytes_to_write) bytes_to_write = size;
         
         if(internal_offset != 0) SD_read_block(sector_buff, next_block);
-        memcpy(sector_buff, buff + internal_offset, bytes_to_write);
+        memcpy(sector_buff + internal_offset, buff, bytes_to_write);
         SD_write_block(sector_buff, next_block);
         
         buff += bytes_to_write;
@@ -138,8 +137,6 @@ int file_write(file_desc* fd, char* buff, uint32_t size)
         {
             temp = alloc_block();
             add_to_cluster(next_block, temp);
-            temp = next_block;
-            continue;
         }
         
         next_block = temp;

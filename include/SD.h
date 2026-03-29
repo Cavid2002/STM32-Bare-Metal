@@ -19,12 +19,13 @@
 #define FREQ_400Khz  6
 #define FREQ_18Mhz  1
 
-
 extern uint8_t sector_buff[];
 extern SPI_REGS* sd_base;
 int SD_init();
 int SD_write_block(char* buff, uint32_t lba);
 int SD_read_block(char* buff, uint32_t lba);
+int SD_dma_read(char* buff, uint32_t lba, uint16_t size);
+int SD_dma_write(char* buff, uint32_t lba, uint16_t size);
 void SD_adjust_freq(uint8_t freq);
 int SD_reset();
 void SD_send_command(uint8_t cmd, uint32_t args, uint8_t crc);

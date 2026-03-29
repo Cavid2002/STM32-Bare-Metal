@@ -4,9 +4,10 @@
 #include "./include/USART.h"
 #include "./include/SD.h"
 #include "./include/LCD.h"
+#include "./include/DMA.h"
 
 
-char start[SECTOR_SIZE] = "Hello from SD card\n\r";
+char start[20];
 
 
 
@@ -32,12 +33,12 @@ int main()
     USART1_init(115200);
     USART1_interrupt_enable();
     SPI1_init();
-
     SD_begin();
-    SD_read_block(temp, 200);    
-    USART1_write_line(temp);
+
+    SD_dma_read(start, 200, 20);    
     while(1)
     {
+        USART1_write_line(start);
         GPIO_pinToggle(GPIO_BASE_A, 0);
         delay(1000000);
     }
