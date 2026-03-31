@@ -19,7 +19,7 @@ uint32_t vector_table[84] __attribute__((section(".vector"))) =
 {
 	[0] = (uint32_t)&_estack,
 	[1] = (uint32_t)_reset,
-	[27] = (uint32_t)DMA1_interrupt_handler,
+	[28] = (uint32_t)DMA1_interrupt_handler,
 	[53] = (uint32_t)USART1_interrupt_handler,
 };
 

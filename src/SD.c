@@ -279,23 +279,27 @@ int SD_write_block(char* buff, uint32_t lba)
 
 int SDA_dma_enque(char* buff, uint32_t lba, uint16_t size, uint8_t op)
 {
-    
     if(dma_write_ptr - dma_read_ptr >= DMA1_QUEUE_SIZE) return 0;
     if(size > 512) size = 512;
     uint8_t index = dma_write_ptr % DMA1_QUEUE_SIZE;
-    dma_write_ptr++;
     dma_queue[index].buff = buff;
     dma_queue[index].size = size;
     dma_queue[index].lba = lba;
     dma_queue[index].dma_op = op;
     dma_queue[index].done = 0;
+    dma_write_ptr++;
 
     if(dma_write_ptr - dma_read_ptr == 1)
     {
         if(DMA1_start_next())
+        {
+            USART1_write_line("Enabling DMA1\r\n");
             DMA1_enable();
+        }
+            
     }
-    
+
+    return 1;
 }
 
 int SD_dma_write(char* buff, uint32_t lba, uint16_t size)
@@ -305,14 +309,13 @@ int SD_dma_write(char* buff, uint32_t lba, uint16_t size)
 
 
 
-int SD_dma_read(uint8_t* buff, uint32_t lba, uint16_t size)
+int SD_dma_read(char* buff, uint32_t lba, uint16_t size)
 {
     uint8_t index = dma_write_ptr % DMA1_QUEUE_SIZE;
 
-    if(!SD_dma_enqueue(buff, lba, size, CMD_SD_READ)) return 0;
+    if(!SDA_dma_enque(buff, lba, size, CMD_SD_READ)) return 0;
 
     while(!dma_queue[index].done);  
-    dma_queue[index].done = 0;
 
     return 1;
 }

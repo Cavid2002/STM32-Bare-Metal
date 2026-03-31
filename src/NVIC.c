@@ -41,8 +41,7 @@ void NVIC_set_priority(uint32_t irq_num, uint8_t priority)
 {
     uint32_t index = irq_num / 4;
     uint32_t offset = irq_num % 4;
-    NVIC_BASE->IPR[index] &= ~(0xFF << (offset * 8));
-    NVIC_BASE->IPR[index] |= priority << (offset * 8);
+    NVIC_BASE->IPR[index] = (priority << (offset * 8)) ;
 }
 
 uint8_t NVIC_get_priority(uint32_t irq_num)

@@ -7,9 +7,7 @@
 #include "./include/DMA.h"
 
 
-char start[20];
-
-
+char start[30];
 
 void delay(uint32_t delay)
 {
@@ -34,10 +32,15 @@ int main()
     USART1_interrupt_enable();
     SPI1_init();
     SD_begin();
+    DMA_init();
 
-    SD_dma_read(start, 200, 20);    
+    if(SD_dma_read(start, 200, 30))
+    {
+        USART1_write_line("Request Enqueued\r\n");
+    }    
     while(1)
     {
+        SD_dma_read(start, 200, 30);
         USART1_write_line(start);
         GPIO_pinToggle(GPIO_BASE_A, 0);
         delay(1000000);

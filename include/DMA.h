@@ -25,7 +25,7 @@ typedef struct
     uint32_t lba;
     uint8_t* buff;
     uint32_t size; 
-    uint8_t done;
+    volatile uint8_t done;
 } DMA_Request;
 
 
@@ -37,12 +37,13 @@ typedef struct
 #define DMA1_QUEUE_SIZE    8
 #define DMA1_BASE ((DMA_REGS*)0x40020000)
 #define DMA2_BASE ((DMA_REGS*)0x40020400)
-#define DMA1_IRQ           11
+#define DMA1_IRQ           12
 
 
 extern DMA_Request dma_queue[DMA1_QUEUE_SIZE];
 extern uint8_t dma_write_ptr;
 extern uint8_t dma_read_ptr;
+extern uint8_t dma_irq;
 
 
 void DMA1_SD_transmit(uint8_t* tx, uint8_t* rx);
@@ -51,6 +52,7 @@ void DMA1_disable();
 void DMA1_interrupt_handler();
 void DMA1_complete_current();
 uint8_t DMA1_start_next();
+void DMA_init();
 
 
 #endif

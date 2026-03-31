@@ -107,6 +107,7 @@ void USART1_init(uint32_t baud_rate)
 
 void USART1_interrupt_enable()
 {
+    NVIC_set_priority(USART1_IVT_INDEX, 1 << 4);
     NVIC_enable_irq(USART1_IVT_INDEX);
     USART1_BASE->CR1 |= USART_CR1_RXNEIE;
     USART1_BASE->CR1 |= USART_CR1_TXEIE;

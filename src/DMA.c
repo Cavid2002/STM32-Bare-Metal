@@ -12,6 +12,7 @@ uint8_t dma_write_ptr = 0;
 uint8_t dma_read_ptr = 0;
 uint8_t dummy_rx = 0xFF;
 uint8_t dummy_tx = 0xFF;
+uint8_t dma_irq = 0;
 
 void DMA1_SD_transmit(uint8_t* tx, uint8_t* rx)
 {
@@ -32,15 +33,19 @@ void DMA1_SD_transmit(uint8_t* tx, uint8_t* rx)
     DMA1_BASE->CHNL_REGS[2].CCR |= 2 << 12 | 
                             (tx != NULL) << 7 |
                              1 << 4 | 
-                             5 << 1;
+                             1 << 3;
     DMA1_BASE->CHNL_REGS[2].CPAR = (uint32_t)&(SPI1_BASE->DR);
-    DMA1_BASE->CHNL_REGS[2].CMAR = (uint32_t)transfer;
+    DMA1_BASE->CHNL_REGS[2].CMAR = (uint32_t)transfer;  
     DMA1_BASE->CHNL_REGS[2].CNDTR = BLOCK_SIZE + 2;
+}
+
+void DMA_init()
+{
+    RCC_BASE_ADDR->AHB_ENBR |= 1 << 0;
 }
 
 void DMA1_enable()
 {
-    RCC_BASE_ADDR->AHB_ENBR |= 1 << 0;
     DMA1_BASE->CHNL_REGS[1].CCR |= (1 << 0);
     DMA1_BASE->CHNL_REGS[2].CCR |= (1 << 0);
     SPI1_BASE->CR2 |= (3 << 0);
@@ -60,7 +65,6 @@ void DMA1_disable()
 void DMA1_complete_current()
 {
     uint8_t index = dma_read_ptr % DMA1_QUEUE_SIZE;
-
     if(dma_queue[index].dma_op == CMD_SD_READ)
     {
         memcpy(dma_queue[index].buff, sector_buff, dma_queue[index].size);
@@ -70,7 +74,7 @@ void DMA1_complete_current()
         uint8_t response = SPI_transmit_poll(sd_base, 0xFF) & 0x1F;
         if(response != 0x05) USART1_write_line("write rejected!\r\n");
     }
-
+    dma_queue[index].done = 1;
     dma_read_ptr++;
 }
 
@@ -114,7 +118,8 @@ uint8_t DMA1_start_next()
 
 void DMA1_interrupt_handler()
 {
-    if(DMA1_BASE->ISR & (1 << 7))
+    dma_irq = 1;
+    if(DMA1_BASE->ISR & ((1 << 7) | (1 << 11)))
     {
         USART1_write_line("DMA ERROR\r\n");
         DMA1_disable();
