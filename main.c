@@ -5,9 +5,11 @@
 #include "./include/SD.h"
 #include "./include/LCD.h"
 #include "./include/DMA.h"
+#include <string.h>
 
 
 char start[30];
+char temp[30];
 
 void delay(uint32_t delay)
 {
@@ -34,14 +36,28 @@ int main()
     SD_begin();
     DMA_init();
 
-    if(SD_dma_read(start, 200, 30))
+    if(SD_read(start, 200, 30))
     {
         USART1_write_line("Request Enqueued\r\n");
     }    
+
+    // strncpy(start, "Testing2\r\n", 30);
+    // for(int i = 0; i < 10; i++)
+    // {
+    //     SD_write(start, 1000 + i, 30);
+    // }
+
+    memset(temp, 0, 30);
+
+    for(int i = 0; i < 10; i++)
+    {
+        SD_read(temp, 1000 + i, 30);
+        USART1_write_line(temp);
+    }
+
+    
     while(1)
     {
-        SD_dma_read(start, 200, 30);
-        USART1_write_line(start);
         GPIO_pinToggle(GPIO_BASE_A, 0);
         delay(1000000);
     }

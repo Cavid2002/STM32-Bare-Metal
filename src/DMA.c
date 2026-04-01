@@ -12,7 +12,6 @@ uint8_t dma_write_ptr = 0;
 uint8_t dma_read_ptr = 0;
 uint8_t dummy_rx = 0xFF;
 uint8_t dummy_tx = 0xFF;
-uint8_t dma_irq = 0;
 
 void DMA1_SD_transmit(uint8_t* tx, uint8_t* rx)
 {
@@ -118,7 +117,6 @@ uint8_t DMA1_start_next()
 
 void DMA1_interrupt_handler()
 {
-    dma_irq = 1;
     if(DMA1_BASE->ISR & ((1 << 7) | (1 << 11)))
     {
         USART1_write_line("DMA ERROR\r\n");
@@ -127,11 +125,10 @@ void DMA1_interrupt_handler()
         return;
     }
 
-    CS_high();
     DMA1_disable();
 
     DMA1_complete_current();
-
+    CS_high();
     if(DMA1_start_next())
         DMA1_enable();
 }

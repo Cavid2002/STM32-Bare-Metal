@@ -43,7 +43,6 @@ typedef struct
 extern DMA_Request dma_queue[DMA1_QUEUE_SIZE];
 extern uint8_t dma_write_ptr;
 extern uint8_t dma_read_ptr;
-extern uint8_t dma_irq;
 
 
 void DMA1_SD_transmit(uint8_t* tx, uint8_t* rx);

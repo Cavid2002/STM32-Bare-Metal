@@ -75,12 +75,6 @@ int SD_init()
     uint32_t timeout;
 
     console_log("SD INIT start...");
-
-    if (SD_reset() != 0)
-    {
-        console_log("[ERROR] SD init failed at reset");
-        return -1;
-    }
     CS_low();
     SD_send_command(8, 0x1AA, 0x87);
     status = SD_get_response();
@@ -201,80 +195,31 @@ int SD_begin()
     return 0;
 }
 
-
-int SD_read_block(char* buff, uint32_t lba)
+int SD_write_sync(char* buff, uint32_t lba, uint16_t size)
 {
-    uint8_t status;
-    uint32_t timeout = SD_TIMEOUT;
-    CS_low();
-    SD_send_command(17, lba, 0xFF);
-    status = SD_get_response();
-    if(status != 0)
-    {
-        console_log("Read error!");
-        CS_high();
-        return -1;
-    } 
+    uint8_t index = dma_write_ptr % DMA1_QUEUE_SIZE;
+    while(!SDA_dma_enque(buff, lba, size, CMD_SD_WRITE));
 
-    while(1)
-    {
-        if(SPI_transmit_poll(sd_base, 0xFF) == 0xFE) break;
-        if(!timeout)
-        {
-            CS_high();
-            console_log("Data Token error!");
-            return -1;
-        }
-        timeout--;
-    }
-
-    for(int i = 0; i < BLOCK_SIZE; i++)
-    {
-        buff[i] = SPI_transmit_poll(sd_base, 0xFF);
-    }
-
-    SPI_transmit_poll(sd_base, 0xFF);
-    SPI_transmit_poll(sd_base, 0xFF);
-
-    CS_high();
-    return 512;
+    while(!dma_queue[index].done);
+    
+    return 1;
 }
 
-int SD_write_block(char* buff, uint32_t lba)
+int SD_read(char* buff, uint32_t lba, uint16_t size)
 {
-    uint8_t status;
-    uint32_t timeout = SD_TIMEOUT;
-    CS_low();
-    SD_send_command(24, lba, 0xFF);
-    status = SD_get_response();
-    if(status != 0)
-    {
-        console_log("write error!");
-        CS_high();
-        return -1;
-    } 
+    uint8_t index = dma_write_ptr % DMA1_QUEUE_SIZE;
+    while(!SDA_dma_enque(buff, lba, size, CMD_SD_READ));
 
+    while(!dma_queue[index].done);  
 
-    SPI_transmit_poll(sd_base, 0xFE);
-    for(int i = 0; i < BLOCK_SIZE; i++)
-    {
-        SPI_transmit_poll(sd_base, buff[i]);
-    }
+    return 1;
+}
 
-    SPI_transmit_poll(sd_base, 0xFF);
-    SPI_transmit_poll(sd_base, 0xFF);
-    
-    status = SPI_transmit_poll(sd_base, 0xFF);
+int SD_write(char* buff, uint32_t lba, uint16_t size)
+{
+    while(!SDA_dma_enque(buff, lba, size, CMD_SD_WRITE));
 
-    if((status & 0x1F) != 0x05)
-    {
-        CS_high();
-        console_log("Write error");
-        return -1;
-    }
-    
-    CS_high();
-    return 512;
+    return 1;
 }
 
 int SDA_dma_enque(char* buff, uint32_t lba, uint16_t size, uint8_t op)
@@ -293,7 +238,6 @@ int SDA_dma_enque(char* buff, uint32_t lba, uint16_t size, uint8_t op)
     {
         if(DMA1_start_next())
         {
-            USART1_write_line("Enabling DMA1\r\n");
             DMA1_enable();
         }
             
@@ -301,25 +245,6 @@ int SDA_dma_enque(char* buff, uint32_t lba, uint16_t size, uint8_t op)
 
     return 1;
 }
-
-int SD_dma_write(char* buff, uint32_t lba, uint16_t size)
-{
-    return SDA_dma_enque(buff, lba, size, CMD_SD_WRITE);
-}
-
-
-
-int SD_dma_read(char* buff, uint32_t lba, uint16_t size)
-{
-    uint8_t index = dma_write_ptr % DMA1_QUEUE_SIZE;
-
-    if(!SDA_dma_enque(buff, lba, size, CMD_SD_READ)) return 0;
-
-    while(!dma_queue[index].done);  
-
-    return 1;
-}
-
 
 
 
