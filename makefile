@@ -7,7 +7,7 @@ LDFLAGS = -T linker.ld -nostartfiles --specs=nano.specs -mcpu=cortex-m3 -mthumb
 
 OBJS = ./bin/main.o ./bin/reset.o ./bin/GPIO.o ./bin/RCC.o \
        ./bin/USART.o ./bin/SD.o ./bin/SPI.o ./bin/LCD.o \
-       ./bin/NVIC.o ./bin/DMA.o ./bin/AFIO.o
+       ./bin/NVIC.o ./bin/DMA.o ./bin/AFIO.o ./bin/STK.o
 
 all: firmware.bin
 
@@ -49,6 +49,10 @@ firmware.elf: $(OBJS)
 
 ./bin/AFIO.o: ./src/AFIO.c ./include/AFIO.h
 	$(CC) $(CFLAGS) $< -o $@
+
+./bin/STK.o: ./src/STK.c ./include/STK.h
+	$(CC) $(CFLAGS) $< -o $@
+
 
 .PHONY: clean flash-unix flash-windows dasm
 

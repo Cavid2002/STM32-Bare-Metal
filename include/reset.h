@@ -14,11 +14,13 @@ extern int main();
 extern void _reset();
 extern void USART1_interrupt_handler();
 extern void DMA1_interrupt_handler();
+extern void STK_interrupt_handler();
 
 uint32_t vector_table[84] __attribute__((section(".vector"))) = 
 {
 	[0] = (uint32_t)&_estack,
 	[1] = (uint32_t)_reset,
+	[15] = (uint32_t)STK_interrupt_handler,
 	[28] = (uint32_t)DMA1_interrupt_handler,
 	[53] = (uint32_t)USART1_interrupt_handler,
 };

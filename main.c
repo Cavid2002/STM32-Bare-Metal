@@ -5,6 +5,7 @@
 #include "./include/SD.h"
 #include "./include/LCD.h"
 #include "./include/DMA.h"
+#include "./include/STK.h"
 #include <string.h>
 
 
@@ -32,14 +33,9 @@ int main()
     
     USART1_init(115200);
     USART1_interrupt_enable();
-    SPI1_init();
-    SD_begin();
-    DMA_init();
+    
+    STK_enable(100000);
 
-    if(SD_read(start, 200, 30))
-    {
-        USART1_write_line("Request Enqueued\r\n");
-    }    
 
     // strncpy(start, "Testing2\r\n", 30);
     // for(int i = 0; i < 10; i++)
@@ -47,13 +43,13 @@ int main()
     //     SD_write(start, 1000 + i, 30);
     // }
 
-    memset(temp, 0, 30);
+    // memset(temp, 0, 30);
 
-    for(int i = 0; i < 10; i++)
-    {
-        SD_read(temp, 1000 + i, 30);
-        USART1_write_line(temp);
-    }
+    // for(int i = 0; i < 10; i++)
+    // {
+    //     SD_read(temp, 1000 + i, 30);
+    //     USART1_write_line(temp);
+    // }
 
     
     while(1)
