@@ -3,50 +3,52 @@
 #include "./include/RCC.h"
 #include "./include/USART.h"
 #include "./include/SD.h"
-#include "./include/LCD.h"
+#include "./include/LCD.h"  
 #include "./include/DMA.h"
 #include "./include/STK.h"
 #include "./include/Task.h"
+#include "./include/SpinLock.h"
 #include <string.h>
 
-
-char start[30];
-char temp[30];
-
-void delay(uint32_t delay)
-{
-    while(delay)
-    {
-        delay--;
-    }
-}
+volatile uint32_t lock = 0;
+volatile uint32_t test = 0;
+volatile uint32_t task_a_done = 0;
+volatile uint32_t task_b_done = 0;
 
 
 void task_a()
 {
-    for(volatile int i = 0; i < 10; i++)
-    USART1_write_line("Task A running\r\n");
-    while(1)
+    for(int i = 0; i < 1000000; i++)
     {
-        
+        spinlock_acquire(&lock);
+        test++;
+        spinlock_release(&lock);
     }
+
+    task_a_done = 1;
+        
+    while(1);
 }
 
 void task_b()
 {
-    for(volatile int i = 0; i < 10; i++)
-        USART1_write_line("Task B running\r\n");
+    for(int i = 0; i < 1000000; i++)
+    {
+        spinlock_acquire(&lock);
+        test++;
+        spinlock_release(&lock);
+    }
+    task_b_done = 1;
+        
     while(1);
 }
 
 void task_c()
 {
-    for(volatile int i = 0; i < 10; i++)
-        USART1_write_line("Task C running\r\n");
-    while(1)
-    {
-        
-    }
+    while(task_a_done != 1 || task_b_done != 1);
+    USART1_print_number(test);
+    USART1_write_line("\r\n");
+    while(1);
 }
 
 
@@ -74,7 +76,6 @@ int main()
     while(1)
     {
         GPIO_pinToggle(GPIO_BASE_A, 0);
-        delay(1000000);
     }
 }
 

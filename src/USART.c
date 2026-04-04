@@ -6,7 +6,7 @@
 #include "../include/SpinLock.h"
 #include <string.h>
 
-volatile uint32_t lock = 0;
+volatile uint32_t USART_lock = 0;
 volatile char char_buff[USART_BUFF_SIZE];
 volatile uint16_t read_ptr = 0;
 volatile uint16_t write_prt = 0;
@@ -63,9 +63,9 @@ uint16_t USART1_write(char* buff, uint16_t size)
     for(i = 0; i < size; i++)
     {
         if(USART_BUFF_SIZE <= write_prt - read_ptr) break;
-        spinlock_acquire(&lock);
+        spinlock_acquire(&USART_lock);
         USART1_write_char(buff[i]);
-        spinlock_release(&lock);
+        spinlock_release(&USART_lock);
     }
     USART1_BASE->CR1 |= (USART_CR1_TXEIE);
     return i;
@@ -77,9 +77,9 @@ uint16_t USART1_read(char* buff, uint16_t size)
     for(i = 0; i < size; i++)
     {
         if(write_prt - read_ptr <= 0) break;
-        spinlock_acquire(&lock);
+        spinlock_acquire(&USART_lock);
         buff[i] = USART1_read_char();
-        spinlock_release(&lock);
+        spinlock_release(&USART_lock);
     }
     return i;
 }
@@ -136,4 +136,41 @@ void USART1_interrupt_handler()
         if(read_ptr != write_prt) USART1_BASE->DR = USART1_read_char();
         else USART1_BASE->CR1 &= ~(USART_CR1_TXEIE);
     }
+}
+
+void USART1_print_number(int32_t n)
+{
+    char buf[12];
+    uint8_t i = 0;
+    uint8_t neg = 0;
+
+    if(n == 0)
+    {
+        USART1_write_line("0");
+        return;
+    }
+
+    if(n < 0)
+    {
+        neg = 1;
+        n = -n;
+    }
+
+    while(n > 0)
+    {
+        buf[i++] = '0' + (n % 10);
+        n /= 10;
+    }
+
+    if(neg) buf[i++] = '-';
+
+    for(int l = 0, r = i - 1; l < r; l++, r--)
+    {
+        char tmp = buf[l];
+        buf[l] = buf[r];
+        buf[r] = tmp;
+    }
+
+    buf[i] = '\0';
+    USART1_write_line(buf);
 }

@@ -22,3 +22,9 @@ _STREX:
 _DMB:
     DMB     SY
     BX      LR
+
+_DISABLE_INTR:
+    CPSID i
+
+_ENABLE_INTR:
+    CPSIE i

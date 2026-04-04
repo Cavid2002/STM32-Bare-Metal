@@ -65,6 +65,7 @@ void USART1_interrupt_handler();
 void USART1_interrupt_enable();
 uint16_t USART1_write(char* buff, uint16_t size);
 uint16_t USART1_read(char* buff, uint16_t size);
+void USART1_print_number(int32_t n);
 
 
 #define USART1_BASE ((USART_REGS*)0x40013800)
