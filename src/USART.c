@@ -3,8 +3,10 @@
 #include "../include/AFIO.h"
 #include "../include/GPIO.h"
 #include "../include/NVIC.h"
+#include "../include/SpinLock.h"
 #include <string.h>
 
+volatile uint32_t lock = 0;
 volatile char char_buff[USART_BUFF_SIZE];
 volatile uint16_t read_ptr = 0;
 volatile uint16_t write_prt = 0;
@@ -22,7 +24,7 @@ uint8_t USART_read_poll(USART_REGS* base)
 }
 
 
-void USART1_write_char(uint8_t c)
+void USART1_put_char(uint8_t c)
 {
     if(c == '\r')
     {
@@ -42,6 +44,12 @@ void USART1_write_char(uint8_t c)
     } 
 }
 
+void USART1_write_char(uint8_t c)
+{
+    char_buff[write_prt % USART_BUFF_SIZE] = c;
+    write_prt++;    
+}
+
 uint8_t USART1_read_char()
 {
     uint8_t res = char_buff[read_ptr % USART_BUFF_SIZE];
@@ -55,8 +63,9 @@ uint16_t USART1_write(char* buff, uint16_t size)
     for(i = 0; i < size; i++)
     {
         if(USART_BUFF_SIZE <= write_prt - read_ptr) break;
-        char_buff[write_prt % USART_BUFF_SIZE] = buff[i];
-        write_prt++;
+        spinlock_acquire(&lock);
+        USART1_write_char(buff[i]);
+        spinlock_release(&lock);
     }
     USART1_BASE->CR1 |= (USART_CR1_TXEIE);
     return i;
@@ -68,8 +77,9 @@ uint16_t USART1_read(char* buff, uint16_t size)
     for(i = 0; i < size; i++)
     {
         if(write_prt - read_ptr <= 0) break;
-        buff[i] = char_buff[read_ptr % USART_BUFF_SIZE];
-        read_ptr++;
+        spinlock_acquire(&lock);
+        buff[i] = USART1_read_char();
+        spinlock_release(&lock);
     }
     return i;
 }
@@ -117,7 +127,7 @@ void USART1_interrupt_handler()
 {
     if(USART1_BASE->SR & USART_STATUS_RXNE)
     {
-        USART1_write_char(USART1_BASE->DR);
+        USART1_put_char(USART1_BASE->DR);
         USART1_BASE->CR1 |= USART_CR1_TXEIE;
     }
 

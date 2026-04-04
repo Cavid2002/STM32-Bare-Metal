@@ -5,6 +5,8 @@
 #include <stdint.h>
 #include "../include/USART.h"
 #include "../include/DMA.h"
+#include "../include/Task.h"
+#include "../include/STK.h"
 
 extern uint32_t _sbss, _ebss;
 extern uint32_t _sdata, _edata, _ldata;
@@ -20,6 +22,7 @@ uint32_t vector_table[84] __attribute__((section(".vector"))) =
 {
 	[0] = (uint32_t)&_estack,
 	[1] = (uint32_t)_reset,
+	[14] = (uint32_t)PendSV_Handler,
 	[15] = (uint32_t)STK_interrupt_handler,
 	[28] = (uint32_t)DMA1_interrupt_handler,
 	[53] = (uint32_t)USART1_interrupt_handler,

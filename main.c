@@ -6,6 +6,7 @@
 #include "./include/LCD.h"
 #include "./include/DMA.h"
 #include "./include/STK.h"
+#include "./include/Task.h"
 #include <string.h>
 
 
@@ -21,6 +22,33 @@ void delay(uint32_t delay)
 }
 
 
+void task_a()
+{
+    for(volatile int i = 0; i < 10; i++)
+    USART1_write_line("Task A running\r\n");
+    while(1)
+    {
+        
+    }
+}
+
+void task_b()
+{
+    for(volatile int i = 0; i < 10; i++)
+        USART1_write_line("Task B running\r\n");
+    while(1);
+}
+
+void task_c()
+{
+    for(volatile int i = 0; i < 10; i++)
+        USART1_write_line("Task C running\r\n");
+    while(1)
+    {
+        
+    }
+}
+
 
 int main()
 {
@@ -33,24 +61,15 @@ int main()
     
     USART1_init(115200);
     USART1_interrupt_enable();
+
+    sched_init();
+
+    sched_task_create(task_a);
+    sched_task_create(task_b);
+    sched_task_create(task_c);
+
+    sched_enable();
     
-    STK_enable(100000);
-
-
-    // strncpy(start, "Testing2\r\n", 30);
-    // for(int i = 0; i < 10; i++)
-    // {
-    //     SD_write(start, 1000 + i, 30);
-    // }
-
-    // memset(temp, 0, 30);
-
-    // for(int i = 0; i < 10; i++)
-    // {
-    //     SD_read(temp, 1000 + i, 30);
-    //     USART1_write_line(temp);
-    // }
-
     
     while(1)
     {

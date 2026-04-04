@@ -23,10 +23,3 @@ uint32_t STK_val()
     return STK_BASE->VAL;
 }
 
-
-
-void STK_interrupt_handler()
-{
-    count++;
-    USART1_write_line("STK interrupt\n\r");
-}

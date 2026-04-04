@@ -3,11 +3,14 @@ LD = arm-none-eabi-gcc
 OBJCPY = arm-none-eabi-objcopy
 
 CFLAGS  = -c -mcpu=cortex-m3 -mthumb -std=gnu11
+ASMFLAGS  = -c -mcpu=cortex-m3 -mthumb
 LDFLAGS = -T linker.ld -nostartfiles --specs=nano.specs -mcpu=cortex-m3 -mthumb
 
 OBJS = ./bin/main.o ./bin/reset.o ./bin/GPIO.o ./bin/RCC.o \
        ./bin/USART.o ./bin/SD.o ./bin/SPI.o ./bin/LCD.o \
-       ./bin/NVIC.o ./bin/DMA.o ./bin/AFIO.o ./bin/STK.o
+       ./bin/NVIC.o ./bin/DMA.o ./bin/AFIO.o ./bin/STK.o \
+	   ./bin/Task.o ./bin/sched_init.o ./bin/context.o \
+	   ./bin/SpinLock.o ./bin/atomic.o
 
 all: firmware.bin
 
@@ -50,8 +53,24 @@ firmware.elf: $(OBJS)
 ./bin/AFIO.o: ./src/AFIO.c ./include/AFIO.h
 	$(CC) $(CFLAGS) $< -o $@
 
+./bin/Task.o: ./src/Task.c ./include/Task.h
+	$(CC) $(CFLAGS) $< -o $@
+
 ./bin/STK.o: ./src/STK.c ./include/STK.h
 	$(CC) $(CFLAGS) $< -o $@
+
+./bin/SpinLock.o: ./src/SpinLock.c ./include/SpinLock.h
+	$(CC) $(CFLAGS) $< -o $@
+
+./bin/atomic.o: ./asm/atomic.s
+	$(CC) $(ASMFLAGS) $< -o $@
+
+./bin/context.o: ./asm/context.s 
+	$(CC) $(ASMFLAGS) $< -o $@
+
+./bin/sched_init.o: ./asm/sched_init.s
+	$(CC) $(ASMFLAGS) $< -o $@
+
 
 
 .PHONY: clean flash-unix flash-windows dasm
