@@ -27,7 +27,7 @@ uint32_t alloc_block()
             if(blk_buff[j] == 0)
             {
                 blk_buff[j] = EOC;
-                disk_write(blk_buff, block_offset);
+                disk_write(blk_buff, block_offset + FAT_START);
                 return j + block_offset * ADR_PER_BLOCK;
             }
         }
@@ -151,7 +151,7 @@ int file_write(file_desc* fd, char* buff, uint32_t size)
     return res;
 }
 
-uint32_t read_dir(uint32_t block_num, char* filename)
+dir_entry read_dir(uint32_t block_num, char* filename)
 {
     dir_entry* dirs = sector_buff;
     while(block_num != EOC)
@@ -162,7 +162,7 @@ uint32_t read_dir(uint32_t block_num, char* filename)
         {
             if(strncmp(dirs[i].name, filename, strlen(filename)) == 0)
             {
-                return dirs[i].block_num;
+                return dirs[i];
             }
         }
 
@@ -170,23 +170,13 @@ uint32_t read_dir(uint32_t block_num, char* filename)
         
     }
 
-    return FAT_ERR_NOT_EXT;
+    return (dir_entry){.name_length = 0};
 }
 
-int add_dir_entry(uint32_t block_num, char* filename, uint32_t type)
+int write_dir(uint32_t block_num, dir_entry new_entry)
 {
     dir_entry* dirs = sector_buff;
     uint32_t prev_block = block_num;
-    uint8_t name_length = strlen(filename);
-    
-    
-    dir_entry new_entry;
-    strcpy(new_entry.name, filename, name_length);
-    new_entry.file_size = 0;
-    new_entry.name_length = name_length;
-    new_entry.block_num = alloc_block();
-    new_entry.type = type;
-
 
     while(block_num != EOC)
     {
@@ -196,8 +186,8 @@ int add_dir_entry(uint32_t block_num, char* filename, uint32_t type)
             if(dirs[i].name_length == 0 && dirs[i].block_num == 0)
             {
                 dirs[i] = new_entry;
-                disk_write(dirs, block_num, sizeof(dir_entry) * DIR_PER_BLOCK)
-                return new_entry.block_num;
+                disk_write(dirs, block_num, BLOCK_SIZE);
+                return 0;
             }
         }
         prev_block = block_num;
@@ -209,20 +199,22 @@ int add_dir_entry(uint32_t block_num, char* filename, uint32_t type)
     
     add_to_cluster(prev_block, block_num);
     disk_write(&new_entry, block_num, sizeof(new_entry));
-    return block_num;
+    return new_entry;
 }
 
 file_desc file_open(char* path, uint8_t flags)
 {
     char* token = strtok(path, "/");
     char* filename = token;
+    dir_entry temp;
     uint32_t next = ROOT_DIR;
     uint32_t prev = next;
     while(token)
     {
+        temp = read_dir(next, token);
+        if(temp.name_length == 0) break;
         prev = next;
-        next = read_dir(next, token);
-        if(next == FAT_ERR_NOT_EXT) break;
+        next = temp.block_num;
         filename = token;
         token = strtok(NULL, "/");
     }
@@ -230,33 +222,67 @@ file_desc file_open(char* path, uint8_t flags)
 
     if(strtok(NULL, "/") != NULL) return FAT_ERR_PATH_ERR;
 
-    uint32_t block;
     if(flags == FAT_FLAG_CREATE)
     {
-        block = add_dir_entry(prev, filename, FAT_TYPE_FILE);
-    }
+        temp.block_num = alloc_block();
+        temp.name_length = strlen(filename);
+        temp.file_size = 0;
+
+        strncpy(temp.name, filename, temp.name_length);
+        write_dir(prev, temp);
+    } 
     
     file_desc fd;
-    fd.curr_block = block;
-    fd.start_block = block;
+    fd.curr_block = temp.block_num;
+    fd.start_block = temp.block_num;
+    fd.file_size = temp.file_size;
+    fd.dir_entry_block = prev;
     fd.offset = 0;
 
+    return fd;
 }
 
 
 int file_close(file_desc* fd)
 {
-    
+    dir_entry* dirs = sector_buff;
+    uint32_t next = fd->dir_entry_block;
+    while(next != EOC)
+    {
+        SD_read(dirs, next, BLOCK_SIZE);
+        for(int i = 0; i < DIR_PER_BLOCK; i++)
+        {
+            if(dirs[i].block_num == fd->start_block)
+            {
+                dirs[i].file_size = fd->file_size;
+                SD_write(dirs, next, BLOCK_SIZE);
+                return 0;
+            }
+        }
+        next = get_next_block(next);
+    }
 
-
+    return 0;
 }
 
 int mount()
 {
-    
+    SD_read(&s_block, 0, sizeof(s_block));
 }
 
-int create_fs()
+int create_fs(uint32_t max_block_num)
 {
+    memset(sector_buff, 0, BLOCK_SIZE);
+    s_block.block_size = BLOCK_SIZE;
+    s_block.total_block_number = max_block_num;
+    s_block.fat_table_size = (max_block_num << 2) >> 9;
+    s_block.root_dir = s_block.fat_table_size + 1;
+    s_block.free_blocks = max_block_num - s_block.fat_table_size;
 
+    for(int i = 0; i < s_block.fat_table_size + 1; i++)
+    {
+        SD_write(sector_buff, i, BLOCK_SIZE);
+    }
+
+    
 }

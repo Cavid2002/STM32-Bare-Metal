@@ -20,11 +20,9 @@ void sched_task_create(void (*task_func)(void))
 
     uint32_t* sp = &task->stack[STACK_SIZE - 1];
 
-    // Fake hardware exception frame so the CPU can
-    // "return" into this task on its first run
-    *(sp)   = 0x01000000;           // xPSR  — Thumb bit must be set
-    *(--sp) = (uint32_t)task_func;  // PC    — task entry point
-    *(--sp) = 0xFFFFFFFD;           // LR    — EXC_RETURN: thread mode, PSP
+    *(sp)   = 0x01000000;           // xPSR
+    *(--sp) = (uint32_t)task_func;  // PC    
+    *(--sp) = 0xFFFFFFFD;           // LR
     *(--sp) = 0x00000000;           // R12
     *(--sp) = 0x00000000;           // R3
     *(--sp) = 0x00000000;           // R2

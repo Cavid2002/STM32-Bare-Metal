@@ -97,6 +97,8 @@ typedef struct{
 }RCC_REGS;
 
 
+#define RCC_BASE_ADDR ((RCC_REGS*)0x40021000)
+
 
 
 void RCC_APB1DevEnable(uint32_t dev);
@@ -111,5 +113,5 @@ void RCC_AHBDevDisable(uint32_t dev);
 
 void RCC_HSE_PLL_enable();
 void RCC_HSI_PLL_enable();
-#define RCC_BASE_ADDR ((RCC_REGS*)0x40021000)
+
 #endif

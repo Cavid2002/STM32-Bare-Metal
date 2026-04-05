@@ -34,6 +34,7 @@ typedef struct
     uint32_t fsys_id;
     uint32_t block_size;
     uint32_t total_block_number;
+    uint32_t fat_table_size;
     uint32_t free_block_num;
 } __attribute__((packed)) super_block;
 
