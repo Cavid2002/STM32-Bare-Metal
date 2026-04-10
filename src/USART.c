@@ -63,9 +63,7 @@ uint16_t USART1_write(char* buff, uint16_t size)
     for(i = 0; i < size; i++)
     {
         if(USART_BUFF_SIZE <= write_prt - read_ptr) break;
-        spinlock_acquire(&USART_lock);
         USART1_write_char(buff[i]);
-        spinlock_release(&USART_lock);
     }
     USART1_BASE->CR1 |= (USART_CR1_TXEIE);
     return i;
@@ -77,9 +75,7 @@ uint16_t USART1_read(char* buff, uint16_t size)
     for(i = 0; i < size; i++)
     {
         if(write_prt - read_ptr <= 0) break;
-        spinlock_acquire(&USART_lock);
         buff[i] = USART1_read_char();
-        spinlock_release(&USART_lock);
     }
     return i;
 }
@@ -110,7 +106,8 @@ void USART1_init(uint32_t baud_rate)
     GPIO_BASE_B->CFGR_LOW |= 0b1011 << 24;
     GPIO_BASE_B->CFGR_LOW |= 0b0100 << 28;
 
-    USART1_BASE->CR1 |= USART_CR1_UE | USART_CR1_TE | USART_CR1_RE;
+    USART1_BASE->CR1 |=USART_CR1_TE | USART_CR1_RE;
+    USART1_BASE->CR1 |= USART_CR1_UE;
     
 }
 

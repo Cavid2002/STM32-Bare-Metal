@@ -54,7 +54,7 @@ void LCD_init()
 }
 
 
-void LCD_move_cursor(uint16_t x0, uint16_t y0, 
+void LCD_set_window(uint16_t x0, uint16_t y0, 
     uint16_t x1, uint16_t y1)
 {
     x0 += OFF_X; x1 += OFF_X;
@@ -73,14 +73,14 @@ void LCD_move_cursor(uint16_t x0, uint16_t y0,
 
 void LCD_put_pixel(uint16_t x, uint16_t y, uint16_t color)
 {
-    LCD_move_cursor(x, y, x, y);
+    LCD_set_window(x, y, x, y);
     LCD_data(color >> 8);
     LCD_data(color & 0xFF);
 }
 
 void LCD_clear_screen(uint16_t color)
 {
-    LCD_move_cursor(0, 0, SCREEN_W, SCREEN_H);
+    LCD_set_window(0, 0, SCREEN_W, SCREEN_H);
     for(int i = 0; i < SCREEN_H; i++)
     {
         for(int j = 0; j < SCREEN_W; j++)

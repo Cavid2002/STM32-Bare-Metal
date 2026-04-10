@@ -21,7 +21,7 @@ void LCD_data(uint8_t data);
 
 void LCD_init();
 
-void LCD_move_cursor(uint16_t x0, uint16_t y0, 
+void LCD_set_window(uint16_t x0, uint16_t y0, 
     uint16_t x1, uint16_t y1);
 
 void LCD_put_pixel(uint16_t x, uint16_t y, uint16_t color);

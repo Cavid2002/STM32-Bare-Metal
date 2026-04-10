@@ -38,7 +38,7 @@ void DMA1_SD_transmit(uint8_t* tx, uint8_t* rx)
     DMA1_BASE->CHNL_REGS[2].CNDTR = BLOCK_SIZE + 2;
 }
 
-void DMA_init()
+void DMA1_init()
 {
     RCC_BASE_ADDR->AHB_ENBR |= 1 << 0;
 }
@@ -117,6 +117,7 @@ uint8_t DMA1_start_next()
 
 void DMA1_interrupt_handler()
 {
+    // USART1_write_line("DMA INTERRUPT\r\n");
     if(DMA1_BASE->ISR & ((1 << 7) | (1 << 11)))
     {
         USART1_write_line("DMA ERROR\r\n");

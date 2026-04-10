@@ -51,7 +51,7 @@ void DMA1_disable();
 void DMA1_interrupt_handler();
 void DMA1_complete_current();
 uint8_t DMA1_start_next();
-void DMA_init();
+void DMA1_init();
 
 
 #endif

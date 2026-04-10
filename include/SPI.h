@@ -11,6 +11,23 @@
 #define SPI_SR_RXNE     (1 << 0)
 
 
+#define SPI_CR1_CPHA        (1 << 0)  
+#define SPI_CR1_CPOL        (1 << 1)  
+#define SPI_CR1_MSTR        (1 << 2)  
+#define SPI_CR1_BR_0        (1 << 3)  
+#define SPI_CR1_BR_1        (1 << 4)  
+#define SPI_CR1_BR_2        (1 << 5)  
+#define SPI_CR1_SPE         (1 << 6)  
+#define SPI_CR1_LSBFIRST    (1 << 7)   
+#define SPI_CR1_SSI         (1 << 8)  
+#define SPI_CR1_SSM         (1 << 9)  
+#define SPI_CR1_RXONLY      (1 << 10) 
+#define SPI_CR1_DFF         (1 << 11)
+#define SPI_CR1_CRCNEXT     (1 << 12) 
+#define SPI_CR1_CRCEN       (1 << 13) 
+#define SPI_CR1_BIDIOE      (1 << 14) 
+#define SPI_CR1_BIDIMODE    (1 << 15)
+
 typedef struct
 {
     volatile uint32_t CR1;

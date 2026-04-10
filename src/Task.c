@@ -1,4 +1,5 @@
 #include "../include/Task.h"
+#include "../include/SpinLock.h"
 #include "../include/STK.h"
 
 TCB tasks[MAX_TASKS];
@@ -43,17 +44,23 @@ void sched_task_create(void (*task_func)(void))
     task_count++;
 }
 
-void STK_interrupt_handler()
+
+void sched_yield()
 {
     uint8_t next_id = (current_task->id + 1) % task_count;
     next_task = &tasks[next_id];   
     ICSR |= (1 << 28);
 }
 
+void STK_interrupt_handler()
+{
+    sched_yield();
+}
+
 void sched_enable()
 {
     current_task = &tasks[0];
-    next_task    = &tasks[0];
+    next_task = &tasks[0];
     STK_enable(100000); 
     sched_start();
 }

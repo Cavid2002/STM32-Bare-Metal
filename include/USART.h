@@ -43,7 +43,7 @@
 #define USART_CR2_ADD        1 << 0
 
 #define USART_TIMEOUT        1000
-#define USART_BUFF_SIZE      32
+#define USART_BUFF_SIZE      128
 
 #define USART1_IVT_INDEX     37
 
@@ -57,6 +57,11 @@ typedef struct
     volatile uint32_t CR3;
     volatile uint32_t GTPR;
 } USART_REGS; 
+
+
+#define USART1_BASE ((USART_REGS*)0x40013800)
+#define USART2_BASE ((USART_REGS*)0x40004400)
+#define USART3_BASE ((USART_REGS*)0x40004800) 
 
 
 void USART1_init(uint32_t baud_rate);

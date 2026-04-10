@@ -2,6 +2,7 @@
 #include "../include/USART.h"
 #include "../include/SD.h"
 #include "../include/DMA.h"
+#include "../include/SpinLock.h"
 
 uint8_t sector_buff[BLOCK_SIZE + 2] = {[512] = 0xFF, [513] = 0xFF};
 SPI_REGS* sd_base = SPI1_BASE;
@@ -16,13 +17,13 @@ void console_log(const char* msg)
 
 void SD_send_command(uint8_t cmd, uint32_t args, uint8_t crc)
 {
-    while(SPI_transmit_poll(sd_base, 0xFF) != 0xFF);
-    SPI_transmit_poll(sd_base, 0x40 | cmd);
-    SPI_transmit_poll(sd_base, (args >> 24) & 0xFF);
-    SPI_transmit_poll(sd_base, (args >> 16) & 0xFF);
-    SPI_transmit_poll(sd_base, (args >> 8) & 0xFF);
-    SPI_transmit_poll(sd_base, args & 0xFF);
-    SPI_transmit_poll(sd_base, crc | 0x01);
+    while(SPI_transmit_poll(SPI1_BASE, 0xFF) != 0xFF);
+    SPI_transmit_poll(SPI1_BASE, 0x40 | cmd);
+    SPI_transmit_poll(SPI1_BASE, (args >> 24) & 0xFF);
+    SPI_transmit_poll(SPI1_BASE, (args >> 16) & 0xFF);
+    SPI_transmit_poll(SPI1_BASE, (args >> 8) & 0xFF);
+    SPI_transmit_poll(SPI1_BASE, args & 0xFF);
+    SPI_transmit_poll(SPI1_BASE, crc | 0x01);
 }
 
 
@@ -32,7 +33,7 @@ uint8_t SD_get_response()
     uint8_t res;
     for(int i = 0; i <= SD_NCR; i++)
     {
-        res = SPI_transmit_poll(sd_base, 0xFF);
+        res = SPI_transmit_poll(SPI1_BASE, 0xFF);
         if(!(res & 0x80)) return res;
          
     }
@@ -48,7 +49,7 @@ int SD_reset()
     console_log("SD RESET start...");
     CS_high();
     for(int i = 0; i < 10; i++)
-        SPI_transmit_poll(sd_base, 0xFF);
+        SPI_transmit_poll(SPI1_BASE, 0xFF);
 
 
     CS_low();
@@ -81,10 +82,10 @@ int SD_init()
 
     if (status == 0x01)
     {
-        ocr[0] = SPI_transmit_poll(sd_base, 0xFF);
-        ocr[1] = SPI_transmit_poll(sd_base, 0xFF);
-        ocr[2] = SPI_transmit_poll(sd_base, 0xFF);
-        ocr[3] = SPI_transmit_poll(sd_base, 0xFF);
+        ocr[0] = SPI_transmit_poll(SPI1_BASE, 0xFF);
+        ocr[1] = SPI_transmit_poll(SPI1_BASE, 0xFF);
+        ocr[2] = SPI_transmit_poll(SPI1_BASE, 0xFF);
+        ocr[3] = SPI_transmit_poll(SPI1_BASE, 0xFF);
         CS_high();
 
         if ((ocr[2] != 0x01) || (ocr[3] != 0xAA))
@@ -122,10 +123,10 @@ int SD_init()
         CS_low();
         SD_send_command(58, 0, 0xFD);
         status = SD_get_response();
-        ocr[0] = SPI_transmit_poll(sd_base, 0xFF);
-        ocr[1] = SPI_transmit_poll(sd_base, 0xFF);
-        ocr[2] = SPI_transmit_poll(sd_base, 0xFF);
-        ocr[3] = SPI_transmit_poll(sd_base, 0xFF);
+        ocr[0] = SPI_transmit_poll(SPI1_BASE, 0xFF);
+        ocr[1] = SPI_transmit_poll(SPI1_BASE, 0xFF);
+        ocr[2] = SPI_transmit_poll(SPI1_BASE, 0xFF);
+        ocr[3] = SPI_transmit_poll(SPI1_BASE, 0xFF);
         CS_high();
 
         if (status != 0x00)
@@ -215,7 +216,7 @@ int SD_read(char* buff, uint32_t lba, uint16_t size)
     return 1;
 }
 
-int SD_write(char* buff, uint32_t lba, uint16_t size)
+int SD_write(char* buff, uint32_t lba, uint16_t     size)
 {
     while(!SDA_dma_enque(buff, lba, size, CMD_SD_WRITE));
 
@@ -227,12 +228,15 @@ int SDA_dma_enque(char* buff, uint32_t lba, uint16_t size, uint8_t op)
     if(dma_write_ptr - dma_read_ptr >= DMA1_QUEUE_SIZE) return 0;
     if(size > 512) size = 512;
     uint8_t index = dma_write_ptr % DMA1_QUEUE_SIZE;
+
+    _DISABLE_INTR();
     dma_queue[index].buff = buff;
     dma_queue[index].size = size;
     dma_queue[index].lba = lba;
     dma_queue[index].dma_op = op;
     dma_queue[index].done = 0;
     dma_write_ptr++;
+    _ENABLE_INTR();
 
     if(dma_write_ptr - dma_read_ptr == 1)
     {
@@ -251,9 +255,9 @@ int SDA_dma_enque(char* buff, uint32_t lba, uint16_t size, uint8_t op)
 void SD_adjust_freq(uint8_t freq)
 {
     freq &= 0x07;
-    sd_base->CR1 &= ~(1 << 6);
-    sd_base->CR1 &= ~(7 << 3);
-    sd_base->CR1 |= freq << 3;
-    sd_base->CR1 |= (1 << 2) | (1 << 9) | (1 << 8);
-    sd_base->CR1 |= 1 << 6;
+    SPI1_BASE->CR1 &= ~(1 << 6);
+    SPI1_BASE->CR1 &= ~(7 << 3);
+    SPI1_BASE->CR1 |= freq << 3;
+    SPI1_BASE->CR1 |= (1 << 2) | (1 << 9) | (1 << 8);
+    SPI1_BASE->CR1 |= 1 << 6;
 }

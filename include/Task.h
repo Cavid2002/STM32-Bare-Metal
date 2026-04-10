@@ -23,6 +23,7 @@ void sched_init();
 void sched_task_create(void (*task_func)(void));
 void sched_enable();
 void sched_start();
+void sched_yield();
 extern void PendSV_Handler();
 
 #define SHPR3       (*((volatile uint32_t*)0xE000ED20))  

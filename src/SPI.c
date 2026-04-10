@@ -12,8 +12,8 @@ void SPI1_init()
     GPIO_BASE_A->CFGR_LOW &= ~(0xFFFF << 16);
     GPIO_BASE_A->CFGR_LOW |= (0xB4B3 << 16);            
     GPIO_BASE_A->ODR |= (1 << 4); 
-    SPI1_BASE->CR1 |= (1 << 2) | (1 << 9) | (1 << 8);
-    SPI1_BASE->CR1 |= 1 << 6;
+    SPI1_BASE->CR1 |= SPI_CR1_MSTR | SPI_CR1_SSI | SPI_CR1_SSM;
+    SPI1_BASE->CR1 |= SPI_CR1_SPE;
 }
 
 
@@ -32,9 +32,9 @@ void SPI2_init()
     GPIO_BASE_B->ODR |= (1 << 14);
     GPIO_BASE_A->ODR |= (1 << 8);
 
-    SPI2_BASE->CR1 |= (1 << 2) | (1 << 9) | (1 << 8);
+    SPI2_BASE->CR1 |= SPI_CR1_MSTR | SPI_CR1_SSI | SPI_CR1_SSM;
     SPI2_BASE->CR1 |= (1 << 0) | (1 << 1);
-    SPI2_BASE->CR1 |= 1 << 6;
+    SPI2_BASE->CR1 |= SPI_CR1_SPE;
 }
 
 
