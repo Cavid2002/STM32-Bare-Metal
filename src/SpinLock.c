@@ -3,7 +3,7 @@
 #include "../include/Task.h"
 
 
-void mutex_acquire(lock_t* lock)
+void spinlock_acquire(lock_t* lock)
 {
     uint32_t status, val;
     while(1)
@@ -21,7 +21,7 @@ void mutex_acquire(lock_t* lock)
     }
 }
 
-void mutex_release(lock_t* lock)
+void spinlock_release(lock_t* lock)
 {
     _DMB();
     *lock = 0;

@@ -25,10 +25,10 @@ void task_a()
     
     for(int i = 0; i < 10000; i++)
     {
-        mutex_acquire(&lock);
+        spinlock_acquire(&lock);
         test++;
         delay(100);
-        mutex_release(&lock);
+        spinlock_release(&lock);
     }
 
     task_a_done = 1;
@@ -44,10 +44,10 @@ void task_b()
     
     for(int i = 0; i < 10000; i++)
     {
-        mutex_acquire(&lock);
+        spinlock_acquire(&lock);
         test++;
         delay(100);
-        mutex_release(&lock);
+        spinlock_release(&lock);
     }
 
     task_b_done = 1;

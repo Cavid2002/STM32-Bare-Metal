@@ -13,7 +13,7 @@ extern void _DMB();
 extern void _DISABLE_INTR();
 extern void _ENABLE_INTR();
 
-void mutex_acquire(lock_t* lock);
-void mutex_release(lock_t* lock);
+void spinlock_acquire(lock_t* lock);
+void spinlock_release(lock_t* lock);
 
 #endif
