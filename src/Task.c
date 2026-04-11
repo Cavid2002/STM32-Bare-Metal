@@ -1,23 +1,27 @@
 #include "../include/Task.h"
 #include "../include/SpinLock.h"
 #include "../include/STK.h"
+#include "../include/DMA.h"
+#include <stddef.h>
 
-TCB tasks[MAX_TASKS];
-TCB* current_task = 0;
-TCB* next_task = 0;
+Task tasks[MAX_TASKS];
+Task* current_task = 0;
+Task* next_task = 0;
 uint8_t task_count = 0;
 
 
 void sched_init()
 {
     SHPR3 |= (0xFF << 16);
+    SHPR3 |= (0xFE << 24);
 }
 
 
 void sched_task_create(void (*task_func)(void))
 {
-    TCB* task = &tasks[task_count];
+    Task* task = &tasks[task_count];
     task->id  = task_count;
+    task->state = TASK_STATE_READY;
 
     uint32_t* sp = &task->stack[STACK_SIZE - 1];
 
@@ -44,10 +48,29 @@ void sched_task_create(void (*task_func)(void))
     task_count++;
 }
 
+void sched_block()
+{
+    current_task->state = TASK_STATE_BLOCKED;
+    while(current_task->state == TASK_STATE_BLOCKED);
+}
+
+void sched_unblock(Task* task)
+{
+    if(task == NULL) return;
+    task->state = TASK_STATE_READY;
+}
 
 void sched_yield()
 {
+    uint8_t id = current_task->id;
     uint8_t next_id = (current_task->id + 1) % task_count;
+    
+    while(tasks[next_id].state == TASK_STATE_BLOCKED) 
+    {
+        next_id = (id + 1) % task_count;
+        id = next_id;
+    } 
+
     next_task = &tasks[next_id];   
     ICSR |= (1 << 28);
 }

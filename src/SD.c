@@ -3,6 +3,7 @@
 #include "../include/SD.h"
 #include "../include/DMA.h"
 #include "../include/SpinLock.h"
+#include <stddef.h>
 
 uint8_t sector_buff[BLOCK_SIZE + 2] = {[512] = 0xFF, [513] = 0xFF};
 SPI_REGS* sd_base = SPI1_BASE;
@@ -198,25 +199,22 @@ int SD_begin()
 
 int SD_write_sync(char* buff, uint32_t lba, uint16_t size)
 {
-    uint8_t index = dma_write_ptr % DMA1_QUEUE_SIZE;
     while(!SDA_dma_enque(buff, lba, size, CMD_SD_WRITE));
 
-    while(!dma_queue[index].done);
-    
+    sched_block();    
     return 1;
 }
 
 int SD_read(char* buff, uint32_t lba, uint16_t size)
 {
-    uint8_t index = dma_write_ptr % DMA1_QUEUE_SIZE;
     while(!SDA_dma_enque(buff, lba, size, CMD_SD_READ));
 
-    while(!dma_queue[index].done);  
+    sched_block();
 
     return 1;
 }
 
-int SD_write(char* buff, uint32_t lba, uint16_t     size)
+int SD_write(char* buff, uint32_t lba, uint16_t  size)
 {
     while(!SDA_dma_enque(buff, lba, size, CMD_SD_WRITE));
 
@@ -225,18 +223,19 @@ int SD_write(char* buff, uint32_t lba, uint16_t     size)
 
 int SDA_dma_enque(char* buff, uint32_t lba, uint16_t size, uint8_t op)
 {
+    _DISABLE_INTR();
     if(dma_write_ptr - dma_read_ptr >= DMA1_QUEUE_SIZE) return 0;
     if(size > 512) size = 512;
     uint8_t index = dma_write_ptr % DMA1_QUEUE_SIZE;
 
-    _DISABLE_INTR();
+    
     dma_queue[index].buff = buff;
     dma_queue[index].size = size;
     dma_queue[index].lba = lba;
     dma_queue[index].dma_op = op;
     dma_queue[index].done = 0;
+    dma_queue[index].waiting_task = (op == CMD_SD_READ) ? current_task : NULL;
     dma_write_ptr++;
-    _ENABLE_INTR();
 
     if(dma_write_ptr - dma_read_ptr == 1)
     {
@@ -246,7 +245,7 @@ int SDA_dma_enque(char* buff, uint32_t lba, uint16_t size, uint8_t op)
         }
             
     }
-
+    _ENABLE_INTR();
     return 1;
 }
 

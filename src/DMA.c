@@ -8,8 +8,8 @@
 #include <stdint.h>
 
 DMA_Request dma_queue[DMA1_QUEUE_SIZE];
-uint8_t dma_write_ptr = 0;
-uint8_t dma_read_ptr = 0;
+uint32_t dma_write_ptr = 0;
+uint32_t dma_read_ptr = 0;
 uint8_t dummy_rx = 0xFF;
 uint8_t dummy_tx = 0xFF;
 
@@ -21,7 +21,7 @@ void DMA1_SD_transmit(uint8_t* tx, uint8_t* rx)
     DMA1_BASE->CHNL_REGS[1].CCR = 0;
     DMA1_BASE->CHNL_REGS[2].CCR = 0;
     
-    DMA1_BASE->CHNL_REGS[1].CCR |= 2 << 12 | 
+    DMA1_BASE->CHNL_REGS[1].CCR |= 2 << 12 |    
                             (rx != NULL) << 7 |
                              0 << 4 | 
                              5 << 1;
@@ -41,6 +41,8 @@ void DMA1_SD_transmit(uint8_t* tx, uint8_t* rx)
 void DMA1_init()
 {
     RCC_BASE_ADDR->AHB_ENBR |= 1 << 0;
+    NVIC_set_priority(DMA1_IRQ, 0x80);
+    NVIC_enable_irq(DMA1_IRQ);
 }
 
 void DMA1_enable()
@@ -48,7 +50,6 @@ void DMA1_enable()
     DMA1_BASE->CHNL_REGS[1].CCR |= (1 << 0);
     DMA1_BASE->CHNL_REGS[2].CCR |= (1 << 0);
     SPI1_BASE->CR2 |= (3 << 0);
-    NVIC_enable_irq(DMA1_IRQ);
 }
 
 void DMA1_disable()
@@ -74,6 +75,8 @@ void DMA1_complete_current()
         if(response != 0x05) USART1_write_line("write rejected!\r\n");
     }
     dma_queue[index].done = 1;
+    if(dma_queue[index].waiting_task)
+        sched_unblock(dma_queue[index].waiting_task);
     dma_read_ptr++;
 }
 

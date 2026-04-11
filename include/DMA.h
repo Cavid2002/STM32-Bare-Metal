@@ -2,6 +2,7 @@
 #define DMA_H
 
 #include <stdint.h>
+#include "../include/Task.h"
 
 typedef struct
 {
@@ -24,7 +25,8 @@ typedef struct
     uint8_t dma_op;
     uint32_t lba;
     uint8_t* buff;
-    uint32_t size; 
+    uint32_t size;
+    Task* waiting_task; 
     volatile uint8_t done;
 } DMA_Request;
 
@@ -41,8 +43,8 @@ typedef struct
 
 
 extern DMA_Request dma_queue[DMA1_QUEUE_SIZE];
-extern uint8_t dma_write_ptr;
-extern uint8_t dma_read_ptr;
+extern uint32_t dma_write_ptr;
+extern uint32_t dma_read_ptr;
 
 
 void DMA1_SD_transmit(uint8_t* tx, uint8_t* rx);

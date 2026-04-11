@@ -71,22 +71,42 @@ void task_c()
 
 void task_d()
 {
-    char buff[20] = "Task D write\r\n";
+    char buff[20] = "Task D write t 2\r\n";
     char temp[20] = "\0"; 
 
-    for(int i = 0; i < 20; i++)
+    GPIO_pinMode(GPIO_BASE_A, 0, GPIO_MODE_OUTPUT_50Mhz, GPIO_CFG_OUTPUT_PUSH_PULL);
+    GPIO_pinToggle(GPIO_BASE_A, 0);
+
+    for(int i = 0; i < 200; i++)
     {
         SD_write(buff, 2000 + i, strlen(buff));
     }
     
-    for(int i = 0; i < 20; i++)
+    for(int i = 0; i < 200; i++)
     {
         SD_read(temp, 2000 + i, 20);
+        USART1_print_number(i);
         USART1_write_line(temp);
     }
 
 
     while(1);
+}
+
+void task_e()
+{
+    
+    while(1)
+    {
+        LCD_clear_screen(0xFFFF);
+        LCD_clear_screen(0xFFF0);
+        LCD_clear_screen(0xFF00);
+        LCD_clear_screen(0xF000);
+        LCD_clear_screen(0x0000);
+        LCD_clear_screen(0x000F);
+        LCD_clear_screen(0x00FF);
+        LCD_clear_screen(0x0FFF);
+    }
 }
 
 
@@ -99,13 +119,20 @@ int main()
     USART1_interrupt_enable();
     
     SPI1_init();
+    SPI2_init();
+    LCD_init();
     SD_begin();
     DMA1_init();
+    
     
 
     sched_init();
 
 
+    sched_task_create(task_a);
+    sched_task_create(task_b);
+    sched_task_create(task_c);
+    sched_task_create(task_e);
     sched_task_create(task_d);
 
     sched_enable();
