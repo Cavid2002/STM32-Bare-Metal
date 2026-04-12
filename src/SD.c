@@ -202,7 +202,7 @@ int SD_write_sync(char* buff, uint32_t lba, uint16_t size)
     while(!SDA_dma_enque(buff, lba, size, CMD_SD_WRITE));
 
     sched_block();    
-    return 1;
+    return size;
 }
 
 int SD_read(char* buff, uint32_t lba, uint16_t size)
@@ -211,14 +211,14 @@ int SD_read(char* buff, uint32_t lba, uint16_t size)
 
     sched_block();
 
-    return 1;
+    return size;
 }
 
 int SD_write(char* buff, uint32_t lba, uint16_t  size)
 {
     while(!SDA_dma_enque(buff, lba, size, CMD_SD_WRITE));
 
-    return 1;
+    return size;
 }
 
 int SDA_dma_enque(char* buff, uint32_t lba, uint16_t size, uint8_t op)

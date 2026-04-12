@@ -52,6 +52,7 @@ void USART1_write_char(uint8_t c)
 
 uint8_t USART1_read_char()
 {
+    if(read_ptr == write_prt) return 0;
     uint8_t res = char_buff[read_ptr % USART_BUFF_SIZE];
     read_ptr++;
     return res;

@@ -15,6 +15,8 @@ uint32_t test = 0;
 uint32_t task_a_done = 0;
 uint32_t task_b_done = 0;
 
+uint8_t block_buff[512];
+
 void delay(uint32_t delay)
 {
     while(delay--);
@@ -90,7 +92,11 @@ void task_d()
     }
 
 
-    while(1);
+    while(1)
+    {
+        GPIO_pinToggle(GPIO_BASE_A, 0);
+        delay(100000);
+    }
 }
 
 void task_e()
@@ -98,15 +104,63 @@ void task_e()
     
     while(1)
     {
-        LCD_clear_screen(0xFFFF);
-        LCD_clear_screen(0xFFF0);
-        LCD_clear_screen(0xFF00);
-        LCD_clear_screen(0xF000);
-        LCD_clear_screen(0x0000);
-        LCD_clear_screen(0x000F);
-        LCD_clear_screen(0x00FF);
-        LCD_clear_screen(0x0FFF);
+        // LCD_clear_screen(0xFFFF);
+        // LCD_clear_screen(0xFFF0);
+        // LCD_clear_screen(0xFF00);
+        // LCD_clear_screen(0xF000);
+        // LCD_clear_screen(0x0000);
+        // LCD_clear_screen(0x000F);
+        // LCD_clear_screen(0x00FF);
+        // LCD_clear_screen(0x0FFF);
     }
+}
+
+
+void display_image()
+{
+    uint32_t size = 64800;
+    uint32_t start_off = 5000;
+    uint32_t bytes_to_read;
+    for(int i = 0; i < 4; i++)
+    {
+        while(size > 0)
+        {
+            bytes_to_read = size > 512 ? 512 : size;
+            size -= SD_read(block_buff, start_off, bytes_to_read);
+            for(int j = 0; j < bytes_to_read; j++)
+            {
+                LCD_data(block_buff[j]);
+            }
+            
+            if(size == 0) break;
+            start_off++;
+        }
+        LCD_set_window(0, 0, SCREEN_W, SCREEN_H);
+        size = 64800 - bytes_to_read;   
+        
+        for(int j = 0; j < 512 - bytes_to_read; j++)
+        {
+            LCD_data(block_buff[j]);
+        }
+        start_off++;
+
+        
+    }
+}
+
+void task_f()
+{
+    char buff[20] = "Task F testing\r\n";
+    uint32_t blocks = 507;
+    
+    LCD_set_window(0, 0, SCREEN_W, SCREEN_H);
+
+
+    while(1)
+    {
+        display_image();
+    }
+
 }
 
 
@@ -128,12 +182,12 @@ int main()
 
     sched_init();
 
-
     sched_task_create(task_a);
     sched_task_create(task_b);
     sched_task_create(task_c);
-    sched_task_create(task_e);
+    // sched_task_create(task_e);
     sched_task_create(task_d);
+    sched_task_create(task_f);
 
     sched_enable();
     

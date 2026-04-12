@@ -275,14 +275,16 @@ int create_fs(uint32_t max_block_num)
     memset(sector_buff, 0, BLOCK_SIZE);
     s_block.block_size = BLOCK_SIZE;
     s_block.total_block_number = max_block_num;
-    s_block.fat_table_size = (max_block_num << 2) >> 9;
+    s_block.fat_table_size = (max_block_num * 4 + BLOCK_SIZE) / BLOCK_SIZE;
     s_block.root_dir = s_block.fat_table_size + 1;
-    s_block.free_blocks = max_block_num - s_block.fat_table_size;
+    s_block.free_blocks = max_block_num - s_block.fat_table_size - 1;
 
     for(int i = 0; i < s_block.fat_table_size + 1; i++)
     {
-        SD_write(sector_buff, i, BLOCK_SIZE);
+        disk_write(sector_buff, i, BLOCK_SIZE);
     }
+
+    disk_write(&s_block, 0, sizeof(s_block));
 
     
 }

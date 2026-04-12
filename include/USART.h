@@ -71,7 +71,8 @@ void USART1_interrupt_enable();
 uint16_t USART1_write(char* buff, uint16_t size);
 uint16_t USART1_read(char* buff, uint16_t size);
 void USART1_print_number(int32_t n);
-
+uint8_t USART1_read_char();
+void USART1_write_char(uint8_t c);
 
 #define USART1_BASE ((USART_REGS*)0x40013800)
 #define USART2_BASE ((USART_REGS*)0x40004400)
