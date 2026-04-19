@@ -10,7 +10,7 @@
 #include "./include/SpinLock.h"
 #include <string.h>
 
-__attribute__((aligned(4))) lock_t lock = 0;
+lock_t lock = 0;
 uint32_t test = 0;
 uint32_t task_a_done = 0;
 uint32_t task_b_done = 0;
@@ -101,17 +101,20 @@ void task_d()
 
 void task_e()
 {
-    
+    int i = 0;
+    char buff[20] = "Task E write\r\n";
+    char temp[20] = "\0"; 
     while(1)
     {
-        // LCD_clear_screen(0xFFFF);
-        // LCD_clear_screen(0xFFF0);
-        // LCD_clear_screen(0xFF00);
-        // LCD_clear_screen(0xF000);
-        // LCD_clear_screen(0x0000);
-        // LCD_clear_screen(0x000F);
-        // LCD_clear_screen(0x00FF);
-        // LCD_clear_screen(0x0FFF);
+        memset(temp, 0, 20);
+        SD_write(buff, 3000 + (i % 200), strlen(buff));
+    
+        SD_read(temp, 3000 + (i % 200), 20);
+        USART1_print_number(i);
+        USART1_write_line(temp);
+        
+        i++;
+        
     }
 }
 
@@ -135,7 +138,7 @@ void display_image()
             if(size == 0) break;
             start_off++;
         }
-        LCD_set_window(0, 0, SCREEN_W, SCREEN_H);
+        LCD_set_window(0, 0, SCREEN_W - 1, SCREEN_H - 1);
         size = 64800 - bytes_to_read;   
         
         for(int j = 0; j < 512 - bytes_to_read; j++)
@@ -153,7 +156,7 @@ void task_f()
     char buff[20] = "Task F testing\r\n";
     uint32_t blocks = 507;
     
-    LCD_set_window(0, 0, SCREEN_W, SCREEN_H);
+    LCD_set_window(0, 0, SCREEN_W - 1, SCREEN_H - 1);
 
 
     while(1)
@@ -185,7 +188,7 @@ int main()
     sched_task_create(task_a);
     sched_task_create(task_b);
     sched_task_create(task_c);
-    // sched_task_create(task_e);
+    sched_task_create(task_e);
     sched_task_create(task_d);
     sched_task_create(task_f);
 

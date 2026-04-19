@@ -62,6 +62,7 @@ void sched_unblock(Task* task)
 
 void sched_yield()
 {
+    _DISABLE_INTR();
     uint8_t id = current_task->id;
     uint8_t next_id = (current_task->id + 1) % task_count;
     
@@ -73,6 +74,7 @@ void sched_yield()
 
     next_task = &tasks[next_id];   
     ICSR |= (1 << 28);
+    _ENABLE_INTR();
 }
 
 void STK_interrupt_handler()

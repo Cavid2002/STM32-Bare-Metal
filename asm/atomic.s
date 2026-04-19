@@ -21,8 +21,8 @@
 
 
 _LDREX:
-    LDREX   R0, [R0]        
-    BX      LR              
+    LDREX R0, [R0]        
+    BX  LR
 
 _STREX:
     STREX R2, R1, [R0]    

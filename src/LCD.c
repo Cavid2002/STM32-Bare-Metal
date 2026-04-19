@@ -80,7 +80,7 @@ void LCD_put_pixel(uint16_t x, uint16_t y, uint16_t color)
 
 void LCD_clear_screen(uint16_t color)
 {
-    LCD_set_window(0, 0, SCREEN_W, SCREEN_H);
+    LCD_set_window(0, 0, SCREEN_W - 1, SCREEN_H - 1);
     for(int i = 0; i < SCREEN_H; i++)
     {
         for(int j = 0; j < SCREEN_W; j++)

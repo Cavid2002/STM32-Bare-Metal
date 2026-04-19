@@ -71,7 +71,7 @@ void DMA1_complete_current()
     }
     else
     {
-        uint8_t response = SPI_transmit_poll(sd_base, 0xFF) & 0x1F;
+        uint8_t response = SPI_transmit_poll(SPI1_BASE, 0xFF) & 0x1F;
         if(response != 0x05) USART1_write_line("write rejected!\r\n");
     }
     dma_queue[index].done = 1;

@@ -10,8 +10,10 @@ void SPI1_init()
     RCC_BASE_ADDR->APB2_ENBR |= RCC_APB2_ENB_AFIO;
 
     GPIO_BASE_A->CFGR_LOW &= ~(0xFFFF << 16);
-    GPIO_BASE_A->CFGR_LOW |= (0xB4B3 << 16);            
+    GPIO_BASE_A->CFGR_LOW |= (0xB8B3 << 16);            
     GPIO_BASE_A->ODR |= (1 << 4); 
+    GPIO_BASE_A->ODR |= (1 << 6); 
+    
     SPI1_BASE->CR1 |= SPI_CR1_MSTR | SPI_CR1_SSI | SPI_CR1_SSM;
     SPI1_BASE->CR1 |= SPI_CR1_SPE;
 }

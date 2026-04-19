@@ -285,6 +285,5 @@ int create_fs(uint32_t max_block_num)
     }
 
     disk_write(&s_block, 0, sizeof(s_block));
-
     
 }
