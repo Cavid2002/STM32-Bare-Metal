@@ -22,23 +22,23 @@ void delay(uint32_t delay)
     while(delay--);
 }
 
+void increment()
+{
+    test++;
+    delay(100);
+}
+
 void task_a()
 {
     
     for(int i = 0; i < 10000; i++)
     {
-        spinlock_acquire(&lock);
-        test++;
-        delay(100);
-        spinlock_release(&lock);
+        increment();
     }
 
     task_a_done = 1;
         
-    while(1)
-    {
-       
-    }
+    while(1);
 }
 
 void task_b()
@@ -46,17 +46,12 @@ void task_b()
     
     for(int i = 0; i < 10000; i++)
     {
-        spinlock_acquire(&lock);
-        test++;
-        delay(100);
-        spinlock_release(&lock);
+        increment();
     }
 
     task_b_done = 1;
 
-    while(1)
-    {
-    }
+    while(1);
 }
 
 void task_c()
@@ -97,6 +92,30 @@ void task_d()
         GPIO_pinToggle(GPIO_BASE_A, 0);
         delay(100000);
     }
+}
+
+
+void task_d()
+{
+    char buff[20] = "Task D write t 2\r\n";
+    char temp[20] = "\0"; 
+
+    GPIO_pinMode(GPIO_BASE_A, 0, GPIO_MODE_OUTPUT_50Mhz, GPIO_CFG_OUTPUT_PUSH_PULL);
+    GPIO_pinToggle(GPIO_BASE_A, 0);
+
+    for(int i = 0; i < 200; i++)
+    {
+        SD_write(buff, 2000 + i, strlen(buff));
+    }
+    
+    for(int i = 0; i < 200; i++)
+    {
+        SD_read(temp, 2000 + i, 20);
+        USART1_print_number(i);
+        USART1_write_line(temp);
+    }
+
+    while(1);
 }
 
 void task_e()

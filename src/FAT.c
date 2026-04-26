@@ -13,26 +13,30 @@ int (*disk_write_sync)(char*, uint32_t, uint16_t) = SD_write_sync;
 uint32_t alloc_block()
 {
     uint32_t* blk_buff = sector_buff;
-    uint32_t start = s_block.free_block_num;
+    uint32_t start = 
+        s_block.total_block_number - s_block.free_block_num;
     uint32_t stop = s_block.total_block_number;
     uint32_t block_offset, index;
-    int i, j;
-    for(i = start; i < stop; i++)
+    
+    while(start < stop)
     {
-        block_offset = i / ADR_PER_BLOCK;
-        index = i % ADR_PER_BLOCK;
-        disk_read(sector_buff, block_offset + FAT_START);
-        for(j = index; j < ADR_PER_BLOCK; j++)
+        index = start / ADR_PER_BLOCK;
+        block_offset = start % ADR_PER_BLOCK;
+        
+        SD_read(blk_buff, index + 1, BLOCK_SIZE);
+        
+        for(int i = block_offset; i < ADR_PER_BLOCK; i++)
         {
-            if(blk_buff[j] == 0)
+            if(blk_buff[i] == 0)
             {
-                blk_buff[j] = EOC;
-                disk_write(blk_buff, block_offset + FAT_START);
-                return j + block_offset * ADR_PER_BLOCK;
+                blk_buff[i] = EOC;
+                SD_write(blk_buff, index + 1, BLOCK_SIZE);
+                return index * ADR_PER_BLOCK + i;
             }
+            start++;
         }
     }
-
+    
     return FAT_ERR_NO_SPC;
 }
 
@@ -202,7 +206,7 @@ int write_dir(uint32_t block_num, dir_entry new_entry)
     return new_entry;
 }
 
-file_desc file_open(char* path, uint8_t flags)
+file_desc file_open(char* path, uint8_t flags, uint8_t perms)
 {
     char* token = strtok(path, "/");
     char* filename = token;

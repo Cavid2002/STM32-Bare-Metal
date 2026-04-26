@@ -13,7 +13,7 @@ uint8_t task_count = 0;
 void sched_init()
 {
     SHPR3 |= (0xFF << 16);
-    SHPR3 |= (0xFE << 24);
+    SHPR3 |= (0x10 << 24);
 }
 
 
@@ -34,7 +34,7 @@ void sched_task_create(void (*task_func)(void))
     *(--sp) = 0x00000000;           // R1
     *(--sp) = 0x00000000;           // R0
 
-    // Fake software-saved registers
+
     *(--sp) = 0x00000000;           // R11
     *(--sp) = 0x00000000;           // R10
     *(--sp) = 0x00000000;           // R9
